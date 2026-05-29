@@ -22,6 +22,7 @@
     const flash = document.getElementById('flash')
     const hint = document.getElementById('hint')
     const countEl = document.getElementById('count')
+    const bowl = document.getElementById('bowl')
     const ents = IDS.map((id) => document.getElementById(id))
 
     // Half-extents of the view at depth D (depends on the live camera fov/aspect)
@@ -94,6 +95,7 @@
         collected++
         countEl.textContent = `${collected}/4`
         if (collected >= 4) {
+          bowl.textContent = '🍲'        // empty bowl -> full soup
           flash.style.opacity = '1'
           if (hint) hint.textContent = ''
         } else if (hint) {

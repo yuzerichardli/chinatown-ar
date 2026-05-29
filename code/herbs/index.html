@@ -13,7 +13,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./herbs.js?v=1"></script>
+  <script src="./herbs.js?v=2"></script>
 
   <style>
     body { margin: 0; }
@@ -30,7 +30,7 @@
       position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
       z-index: 4; pointer-events: none; text-align: center; line-height: 1;
     }
-    #pot .bowl { font-size: 96px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+    #pot .bowl { font-size: 150px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
     #pot #count {
       color: #fff; font: 700 18px -apple-system, system-ui, sans-serif;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8); margin-top: -8px;
@@ -71,7 +71,7 @@
   </a-scene>
 
   <div id="dragsurface"></div>
-  <div id="pot"><div class="bowl">🍲</div><div id="count">0/4</div></div>
+  <div id="pot"><div class="bowl" id="bowl">🥣</div><div id="count">0/4</div></div>
   <div id="flash"></div>
   <div id="hint">Drag each ingredient into the soup pot</div>
 </body>
