@@ -20,7 +20,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./poses.js?v=2"></script>
+  <script src="./poses.js?v=3"></script>
 
   <style>
     #hint {
@@ -45,19 +45,20 @@
     <a-assets>
       <a-asset-item id="pose0" src="../../model/taichi.glb?v=3"></a-asset-item>
       <a-asset-item id="pose1" src="../../model/taichi2.glb?v=1"></a-asset-item>
-      <a-asset-item id="pose2" src="../../model/taichi3.glb?v=1"></a-asset-item>
+      <a-asset-item id="pose2" src="../../model/taichi3.glb?v=2"></a-asset-item>
     </a-assets>
 
-    <!-- The master is head-locked to the camera (stays in front, facing you).
-         All three pose entities sit at the SAME position/rotation/scale; we just
-         show one at a time (toggling visibility — no model reloading), so each
-         pose appears in the exact same place and size.
-         Tune for all three together via the constants in poses.js. -->
-    <a-camera position="0 0 0">
-      <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"></a-entity>
-      <a-entity class="pose" id="poseEntity1" gltf-model="#pose1" visible="false"></a-entity>
-      <a-entity class="pose" id="poseEntity2" gltf-model="#pose2" visible="false"></a-entity>
-    </a-camera>
+    <a-camera position="0 0 0"></a-camera>
+
+    <!-- World-anchored master: placed in the real room (NOT attached to the
+         camera), so he stays put as you walk around and you can see his back.
+         He starts in front of you, facing you. All three poses sit at the SAME
+         position/rotation/scale; we just show one at a time (toggling
+         visibility), so each pose appears in the exact same place and size.
+         Tune the shared framing via the constants in poses.js. -->
+    <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"></a-entity>
+    <a-entity class="pose" id="poseEntity1" gltf-model="#pose1" visible="false"></a-entity>
+    <a-entity class="pose" id="poseEntity2" gltf-model="#pose2" visible="false"></a-entity>
 
     <a-light type="ambient" intensity="0.85"></a-light>
     <a-light type="directional" intensity="0.8" position="1 2 1"></a-light>

@@ -1,4 +1,5 @@
-/* Head-locked tai chi master with tap-to-cycle poses.
+/* World-anchored tai chi master with tap-to-cycle poses.
+   He's placed in the room facing you and stays put as you walk around.
    All poses share ONE transform, so every pose appears in the same place and
    size; a tap just toggles which entity is visible (no model reloading, which
    is what made the figure vanish before). */
