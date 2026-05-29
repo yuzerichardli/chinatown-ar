@@ -91,14 +91,19 @@
       taichi: {
         title: "Morning Tai Chi",
         desc: "Every morning, locals gather here to practice tai chi. Meet the master.",
-        model: "../model/taichi.glb?v=3",
+        // Poses cycle in this order on each tap, then loop back to the first.
+        poses: [
+          "../model/taichi.glb?v=3",
+          "../model/taichi2.glb?v=1",
+          "../model/taichi3.glb?v=1",
+        ],
         credit: "",   // e.g. "3D model by <artist name>" if a license requires it
       },
-      // Example for your next spot — add the .glb to ../model/ then uncomment:
+      // Example for your next spot — add the .glb(s) to ../model/ then uncomment:
       // "lion-dance": {
       //   title: "Lion Dance Corner",
       //   desc: "During festivals, the lion dance winds through these streets.",
-      //   model: "../model/lion-dance.glb",
+      //   poses: ["../model/lion-dance.glb"],
       //   credit: "",
       // },
     };
@@ -108,24 +113,73 @@
     const spot = LOCATIONS[key] || LOCATIONS.taichi;   // default if no/unknown ?spot
 
     const viewer = document.getElementById("viewer");
-    viewer.src = spot.model;
+    const hint = document.getElementById("hint");
+    const bar = viewer.querySelector(".progress-bar");
+
     document.getElementById("title").textContent = spot.title;
     document.getElementById("desc").textContent = spot.desc;
     document.getElementById("credit").textContent = spot.credit || "";
     document.title = spot.title + " — Chinatown AR";
 
-    // Drive the loading bar so people know the model is downloading.
-    const bar = viewer.querySelector(".progress-bar");
+    // Support either a list of poses or a single model.
+    const poses = spot.poses || [spot.model];
+    let idx = 0;
+
+    function updateHint() {
+      hint.textContent = poses.length > 1
+        ? `Pose ${idx + 1} / ${poses.length} — changing automatically · tap to skip · then “View in AR”.`
+        : `Tap “View in AR”, point at the ground, and step back.`;
+    }
+
+    function loadPose(i) {
+      idx = (i % poses.length + poses.length) % poses.length;  // wrap around
+      bar.style.opacity = "1";
+      bar.style.width = "0%";
+      viewer.src = poses[idx];
+      updateHint();
+    }
+
+    loadPose(0);  // show the first pose
+
+    // Drive the loading bar while each model downloads.
     viewer.addEventListener("progress", (e) => {
       const pct = e.detail.totalProgress * 100;
       bar.style.width = pct + "%";
-      if (pct >= 100) {
-        bar.style.opacity = "0";
-        document.getElementById("desc").textContent = spot.desc;
-      } else {
-        document.getElementById("desc").textContent = "Loading the scene…";
-      }
+      bar.style.opacity = pct >= 100 ? "0" : "1";
     });
+
+    // Tap the figure to advance to the next pose. We tell a quick tap apart from
+    // a drag (which orbits the camera) so rotating the view doesn't change poses.
+    // NOTE: this works in the on-screen 3D view only. Once "View in AR" hands off
+    // to the phone's AR viewer, the pose can no longer be switched from here.
+    let downX = 0, downY = 0, downT = 0, dragged = false;
+    viewer.addEventListener("pointerdown", (e) => {
+      downX = e.clientX; downY = e.clientY; downT = Date.now(); dragged = false;
+    });
+    viewer.addEventListener("pointermove", (e) => {
+      if (Math.hypot(e.clientX - downX, e.clientY - downY) > 10) dragged = true;
+    });
+    viewer.addEventListener("pointerup", (e) => {
+      if (dragged || Date.now() - downT > 400) return;   // it was a drag / orbit
+      if (e.target.closest(".ar-button")) return;        // let the AR button work
+      if (poses.length > 1) { loadPose(idx + 1); startAuto(); }  // skip + reset timer
+    });
+
+    // Auto-advance through the poses every few seconds.
+    // NOTE: this animates the on-screen 3D view only. Inside the phone's live AR
+    // camera (Quick Look / Scene Viewer), the page can't swap models, so this
+    // timer does not run there — for motion in AR you need a single ANIMATED model.
+    const AUTO_MS = 4000;
+    let timer = null;
+    function startAuto() {
+      stopAuto();
+      if (poses.length > 1) timer = setInterval(() => loadPose(idx + 1), AUTO_MS);
+    }
+    function stopAuto() { if (timer) { clearInterval(timer); timer = null; } }
+    startAuto();
+
+    // Warm the browser cache so later poses appear instantly when cycled.
+    poses.slice(1).forEach((u) => fetch(u).catch(() => {}));
   </script>
 </body>
 </html>
