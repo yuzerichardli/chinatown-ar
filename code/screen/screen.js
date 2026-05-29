@@ -10,7 +10,7 @@
   // ---- Tuning ----
   const COUNT = 10            // total slides (img0..img9)
   const STORY_FROM = 8        // idx >= 8 (pics 9 & 10) are full-screen stories
-  const PLANE_W = 1.49, PLANE_H = 1.16   // matches picplane geometry in index.html
+  const PLANE_W = 1.49, PLANE_H = 1.05   // matches picplane geometry in index.html
   const ORBIT_SENS = 0.15
   const MIN_SCALE = 0.25, MAX_SCALE = 3.0
   // ----------------
