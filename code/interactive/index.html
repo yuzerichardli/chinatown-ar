@@ -20,7 +20,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./poses.js?v=3"></script>
+  <script src="./poses.js?v=4"></script>
 
   <style>
     #hint {
@@ -66,5 +66,10 @@
 
   <div id="tapcatcher"></div>
   <div id="hint">Tap anywhere to change pose</div>
+  <!-- TEMP debug readout: shows the live camera position so we can check if
+       positional (6DoF) tracking is working. Walk around — if the numbers
+       change, tracking is alive. Remove this div once confirmed. -->
+  <div id="dbg" style="position:fixed;top:8px;left:8px;z-index:4;color:#0f0;
+       font:12px/1.4 monospace;text-shadow:0 1px 2px #000;pointer-events:none;">cam …</div>
 </body>
 </html>
