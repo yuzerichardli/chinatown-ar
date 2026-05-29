@@ -55,7 +55,7 @@
       } else if (oneActive && e.touches.length === 1) {
         const dx = e.touches[0].clientX - startX
         if (Math.abs(dx) > 8) dragged = true
-        theta = startTheta + dx * ORBIT_SENS
+        theta = startTheta - dx * ORBIT_SENS   // flipped to match drag direction
         applyOrbit()
         e.preventDefault()
       }
