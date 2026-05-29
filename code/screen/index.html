@@ -13,7 +13,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./screen.js?v=1"></script>
+  <script src="./screen.js?v=2"></script>
 
   <style>
     #hint {
@@ -31,8 +31,8 @@
     renderer="colorManagement: true"
     xrweb="allowedDevices: any; scale: absolute">
 
-    <!-- All photos preloaded so swapping is instant -->
     <a-assets>
+      <a-asset-item id="screenModel" src="../../model/screen.glb?v=2"></a-asset-item>
       <img id="img0" src="pictures/pic01.jpg" crossorigin="anonymous">
       <img id="img1" src="pictures/pic02.jpg" crossorigin="anonymous">
       <img id="img2" src="pictures/pic03.jpg" crossorigin="anonymous">
@@ -45,25 +45,28 @@
       <img id="img9" src="pictures/pic10.jpg" crossorigin="anonymous">
     </a-assets>
 
-    <!-- The screen is a single flat panel. Its texture IS the photo, so screen
-         and image always move/zoom together and fit perfectly. It's on a rig
-         attached to the camera, so it's steady (no world-tracking drift):
-           drag  -> orbit it around you   (screen.js)
-           pinch -> zoom
-           tap   -> next photo (the plane resizes to that photo's shape) -->
+    <!-- The 3D movie-screen model + a photo plane sitting on its screen face,
+         both inside one group so they move/zoom together. Camera-relative rig:
+           drag  -> orbit around you,  pinch -> zoom,  tap -> next photo. -->
     <a-camera position="0 0 0">
       <a-entity id="orbitRig" rotation="0 0 0">
-        <a-entity id="screen"
-                  position="0 0 -2.5"
-                  geometry="primitive: plane; width: 2.25; height: 1.5"
-                  material="shader: flat; src: #img0; side: double"></a-entity>
+        <a-entity id="screenGroup" position="0 0 -3" scale="0.75 0.75 0.75">
+          <!-- the cinema screen model -->
+          <a-entity id="screenModel" gltf-model="#screenModel"></a-entity>
+          <!-- the photo, fitted onto the recessed screen face (+Z), unlit -->
+          <a-entity id="picplane"
+                    position="0 0.005 0.09"
+                    geometry="primitive: plane; width: 1.4; height: 1.05"
+                    material="shader: flat; src: #img0; side: front"></a-entity>
+        </a-entity>
       </a-entity>
     </a-camera>
 
     <a-light type="ambient" intensity="1.0"></a-light>
+    <a-light type="directional" intensity="0.6" position="1 2 2"></a-light>
   </a-scene>
 
   <div id="tapcatcher"></div>
-  <div id="hint">Drag to move · pinch to zoom · tap for next photo</div>
+  <div id="hint">Drag to move · pinch to zoom · tap for next scene</div>
 </body>
 </html>
