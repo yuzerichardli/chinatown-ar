@@ -20,7 +20,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./poses.js?v=8"></script>
+  <script src="./poses.js?v=9"></script>
 
   <style>
     #hint {
@@ -48,28 +48,28 @@
       <a-asset-item id="pose2" src="../../model/taichi3.glb?v=2"></a-asset-item>
     </a-assets>
 
-    <a-camera position="0 0 0"></a-camera>
-
-    <!-- World-anchored master: placed in the real room (NOT attached to the
-         camera), so he stays put as you walk around and you can see his back.
-         He starts in front of you, facing you. All three poses sit at the SAME
-         position/rotation/scale; we just show one at a time (toggling
-         visibility), so each pose appears in the exact same place and size.
-         Tune the shared framing via the constants in poses.js. -->
-    <a-entity class="pose" id="poseEntity0" gltf-model="#pose0" visible="false"></a-entity>
-    <a-entity class="pose" id="poseEntity1" gltf-model="#pose1" visible="false"></a-entity>
-    <a-entity class="pose" id="poseEntity2" gltf-model="#pose2" visible="false"></a-entity>
+    <!-- Camera-relative orbit rig. The master sits a fixed distance in front of
+         you and faces you. Dragging spins this rig, so he travels around YOU on
+         a circle (you are the center) rather than spinning on the spot; pinch
+         zooms him. Because he's attached to the camera rig (not the room), he's
+         rock-steady — no world-tracking drift. All three poses share the same
+         spot; we toggle visibility so tapping swaps pose in place. -->
+    <a-camera position="0 0 0">
+      <a-entity id="orbitRig" rotation="0 0 0">
+        <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"
+                  position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5"></a-entity>
+        <a-entity class="pose" id="poseEntity1" gltf-model="#pose1"
+                  position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5" visible="false"></a-entity>
+        <a-entity class="pose" id="poseEntity2" gltf-model="#pose2"
+                  position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5" visible="false"></a-entity>
+      </a-entity>
+    </a-camera>
 
     <a-light type="ambient" intensity="0.85"></a-light>
     <a-light type="directional" intensity="0.8" position="1 2 1"></a-light>
   </a-scene>
 
   <div id="tapcatcher"></div>
-  <div id="hint">Tap anywhere to change pose</div>
-  <!-- TEMP debug readout: shows the live camera position so we can check if
-       positional (6DoF) tracking is working. Walk around — if the numbers
-       change, tracking is alive. Remove this div once confirmed. -->
-  <div id="dbg" style="position:fixed;top:8px;left:8px;z-index:4;color:#0f0;
-       font:12px/1.4 monospace;text-shadow:0 1px 2px #000;pointer-events:none;">cam …</div>
+  <div id="hint">Drag to move him around you · pinch to zoom · tap to change pose</div>
 </body>
 </html>
