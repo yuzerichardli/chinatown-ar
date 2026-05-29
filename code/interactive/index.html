@@ -20,7 +20,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./poses.js?v=11"></script>
+  <script src="./poses.js?v=12"></script>
 
   <style>
     #hint {
@@ -43,9 +43,10 @@
 
     <!-- All three poses preloaded so switching is instant -->
     <a-assets>
-      <a-asset-item id="pose0" src="../../model/taichi.glb?v=3"></a-asset-item>
-      <a-asset-item id="pose1" src="../../model/taichi2.glb?v=1"></a-asset-item>
-      <a-asset-item id="pose2" src="../../model/taichi3.glb?v=2"></a-asset-item>
+      <a-asset-item id="pose0" src="../../model/masters/tai-chi-pose.glb"></a-asset-item>
+      <a-asset-item id="pose1" src="../../model/masters/tai-chi-stance.glb"></a-asset-item>
+      <a-asset-item id="pose2" src="../../model/masters/blue-clad.glb"></a-asset-item>
+      <a-asset-item id="pose3" src="../../model/masters/prayer.glb"></a-asset-item>
     </a-assets>
 
     <!-- Camera-relative orbit rig. The master sits a fixed distance in front of
@@ -61,6 +62,8 @@
         <a-entity class="pose" id="poseEntity1" gltf-model="#pose1"
                   position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5" visible="false"></a-entity>
         <a-entity class="pose" id="poseEntity2" gltf-model="#pose2"
+                  position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5" visible="false"></a-entity>
+        <a-entity class="pose" id="poseEntity3" gltf-model="#pose3"
                   position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5" visible="false"></a-entity>
       </a-entity>
     </a-camera>

@@ -15,7 +15,7 @@
   let scale = 2.5          // starting size
   // ----------------
 
-  const IDS = ['poseEntity0', 'poseEntity1', 'poseEntity2']
+  const IDS = ['poseEntity0', 'poseEntity1', 'poseEntity2', 'poseEntity3']
   let idx = 0
   let theta = 0            // orbit angle (degrees)
 
