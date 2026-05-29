@@ -1,24 +1,26 @@
 /* World-anchored tai chi master with tap-to-cycle poses.
-   On AR start he is spawned ONCE directly in front of the camera (so he's
-   centered + facing you), then left in world space so he stays put as you
-   walk around. A tap toggles which preloaded pose is visible (no reloading),
-   so each pose appears in the same spot and size.
 
-   There is also a temporary on-screen camera-position readout (#dbg) so we can
-   verify whether 6DoF positional tracking is actually running. */
+   Placement: we wait ~1.5s after the camera/tracking comes up (so it knows your
+   real eye height), THEN spawn him ONCE directly in front of you at eye level,
+   and leave him there in world space — so he stays put and you can walk around
+   to his back. A tap toggles which preloaded pose is visible (same spot/size).
+
+   #dbg shows the live camera position (temporary, for verifying tracking). */
 
 (function () {
   const THREE = AFRAME.THREE
 
   // ---- Tuning ----
-  const DIST = 2       // how far in front of you he spawns
-  const Y_OFFSET = 0     // 0 = his center sits at camera/eye level, directly in front
-  const SCALE = '2.5 2.5 2.5'  // a bit larger
+  const DIST = 1.3              // how far in front he spawns (smaller = closer + easier to circle)
+  const Y_OFFSET = 0           // 0 = his center at camera/eye level
+  const SCALE = '3.6 3.6 3.6'  // bigger / smaller
+  const SETTLE_MS = 1500       // wait for tracking to settle before placing
   // ----------------
 
   const IDS = ['poseEntity0', 'poseEntity1', 'poseEntity2']
   let idx = 0
   let placed = false
+  let camFirstSeen = 0
 
   window.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene')
@@ -26,42 +28,46 @@
     const hint = document.getElementById('hint')
     const dbg = document.getElementById('dbg')
 
-    // Tap to cycle pose (in place)
+    entities.forEach((e) => e.setAttribute('visible', 'false'))  // hidden until placed
+    if (hint) hint.textContent = 'Look ahead and hold steady…'
+
+    // Tap to cycle pose (only after he's placed)
     document.getElementById('tapcatcher').addEventListener('click', () => {
+      if (!placed) return
       entities[idx].setAttribute('visible', 'false')
       idx = (idx + 1) % entities.length
       entities[idx].setAttribute('visible', 'true')
       if (hint) hint.textContent = `Pose ${idx + 1} / ${entities.length} — tap to change`
     })
 
-    // Place him once, directly ahead of where the camera is looking.
+    // Spawn him once, directly ahead at the camera's current eye level.
     function placeInFront() {
       const cam = scene.camera
       if (!cam) return false
       const P = new THREE.Vector3(); cam.getWorldPosition(P)
-      const F = new THREE.Vector3(); cam.getWorldDirection(F)  // camera forward (-Z)
+      const F = new THREE.Vector3(); cam.getWorldDirection(F)  // forward (-Z)
       F.y = 0
       if (F.lengthSq() < 1e-6) return false
       F.normalize()
       const T = P.clone().add(F.multiplyScalar(DIST))
       T.y = P.y + Y_OFFSET
-      const dir = P.clone().sub(T)                              // from him toward camera
+      const dir = P.clone().sub(T)                              // from him toward you
       const yaw = THREE.MathUtils.radToDeg(Math.atan2(dir.x, dir.z))
       entities.forEach((e) => {
         e.setAttribute('position', `${T.x.toFixed(3)} ${T.y.toFixed(3)} ${T.z.toFixed(3)}`)
         e.setAttribute('rotation', `0 ${yaw.toFixed(1)} 0`)
         e.setAttribute('scale', SCALE)
       })
+      entities[0].setAttribute('visible', 'true')               // reveal first pose
+      if (hint) hint.textContent = 'Tap anywhere to change pose · walk around him'
       return true
     }
 
-    scene.addEventListener('realityready', () => { placed = placeInFront() })
-
-    // Debug + safety placement loop
     function tick() {
       const cam = scene.camera
       if (cam) {
-        if (!placed) placed = placeInFront()
+        if (!camFirstSeen) camFirstSeen = performance.now()
+        if (!placed && performance.now() - camFirstSeen > SETTLE_MS) placed = placeInFront()
         if (dbg) {
           const P = new THREE.Vector3(); cam.getWorldPosition(P)
           dbg.textContent =

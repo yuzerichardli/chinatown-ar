@@ -20,7 +20,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./poses.js?v=5"></script>
+  <script src="./poses.js?v=6"></script>
 
   <style>
     #hint {
@@ -56,7 +56,7 @@
          position/rotation/scale; we just show one at a time (toggling
          visibility), so each pose appears in the exact same place and size.
          Tune the shared framing via the constants in poses.js. -->
-    <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"></a-entity>
+    <a-entity class="pose" id="poseEntity0" gltf-model="#pose0" visible="false"></a-entity>
     <a-entity class="pose" id="poseEntity1" gltf-model="#pose1" visible="false"></a-entity>
     <a-entity class="pose" id="poseEntity2" gltf-model="#pose2" visible="false"></a-entity>
 
