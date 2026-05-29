@@ -9,7 +9,7 @@
 
 (function () {
   // ---- Tuning ----
-  const ORBIT_SENS = 0.3   // degrees he travels around you per pixel dragged
+  const ORBIT_SENS = 0.15  // degrees he travels around you per pixel dragged
   const MIN_SCALE = 1.0
   const MAX_SCALE = 6.0
   let scale = 2.5          // starting size
