@@ -13,15 +13,22 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./screen.js?v=2"></script>
+  <script src="./screen.js?v=3"></script>
 
   <style>
     #hint {
       position: fixed; left: 0; right: 0; bottom: 28px; text-align: center;
       pointer-events: none; font-family: -apple-system, system-ui, sans-serif;
       color: #fff; font-size: 16px; padding: 0 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+      z-index: 6;
     }
     #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; }
+    /* Full-screen story view (pics 9 & 10): large, readable, taps pass through */
+    #story {
+      position: fixed; inset: 0; background: #000; display: none;
+      z-index: 5; pointer-events: none;
+    }
+    #story img { width: 100%; height: 100%; object-fit: contain; }
   </style>
 </head>
 <body>
@@ -53,10 +60,12 @@
         <a-entity id="screenGroup" position="0 0 -3" scale="0.75 0.75 0.75">
           <!-- the cinema screen model -->
           <a-entity id="screenModel" gltf-model="#screenModel"></a-entity>
-          <!-- the photo, fitted onto the recessed screen face (+Z), unlit -->
+          <!-- the photo, covering the screen face (+Z), unlit. The picplane is
+               sized to the full screen opening; screen.js cover-crops the photo
+               so it fills edge-to-edge with no white border. -->
           <a-entity id="picplane"
                     position="0 0.005 0.09"
-                    geometry="primitive: plane; width: 1.4; height: 1.05"
+                    geometry="primitive: plane; width: 1.49; height: 1.16"
                     material="shader: flat; src: #img0; side: front"></a-entity>
         </a-entity>
       </a-entity>
@@ -66,6 +75,7 @@
     <a-light type="directional" intensity="0.6" position="1 2 2"></a-light>
   </a-scene>
 
+  <div id="story"><img id="storyimg" alt="story"></div>
   <div id="tapcatcher"></div>
   <div id="hint">Drag to move · pinch to zoom · tap for next scene</div>
 </body>

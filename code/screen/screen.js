@@ -1,21 +1,21 @@
-/* Films-at-the-Gate: photos play on the screen face of the screen.glb model.
-   The model + photo plane live in one group, so they move/zoom together:
-     drag  -> orbit the screen around you
-     pinch -> zoom
-     tap   -> next photo
-   Each photo is fitted INSIDE the screen opening (preserving aspect, so no
-   stretching — like a film with letterboxing on a cinema screen). */
+/* Films-at-the-Gate.
+   Scenes 1–8: photos play on the screen.glb screen face, cover-cropped to fill
+               it edge-to-edge (no white border, no stretching).
+   Scenes 9–10: story/description slides — the 3D screen is hidden and the image
+               is shown FULL-SCREEN on the phone, large and readable.
+   Gestures (photo scenes): drag = orbit, pinch = zoom, tap = next.
+   Tap also advances through the story slides and loops back to scene 1. */
 
 (function () {
   // ---- Tuning ----
-  const COUNT = 10
-  const SCREEN_W = 1.40       // usable screen opening (model units)
-  const SCREEN_H = 1.05
+  const COUNT = 10            // total slides (img0..img9)
+  const STORY_FROM = 8        // idx >= 8 (pics 9 & 10) are full-screen stories
+  const PLANE_W = 1.49, PLANE_H = 1.16   // matches picplane geometry in index.html
   const ORBIT_SENS = 0.15
   const MIN_SCALE = 0.25, MAX_SCALE = 3.0
   // ----------------
 
-  let idx = 0, theta = 0, scale = 0.75   // start scale matches index.html
+  let idx = 0, theta = 0, scale = 0.75
 
   window.addEventListener('DOMContentLoaded', () => {
     const rig = document.getElementById('orbitRig')
@@ -23,27 +23,45 @@
     const pic = document.getElementById('picplane')
     const hint = document.getElementById('hint')
     const surface = document.getElementById('tapcatcher')
+    const story = document.getElementById('story')
+    const storyImg = document.getElementById('storyimg')
 
     const applyScale = () => group.setAttribute('scale', `${scale} ${scale} ${scale}`)
     const applyOrbit = () => rig.setAttribute('rotation', `0 ${theta} 0`)
+    const fname = (i) => `pictures/pic${String(i + 1).padStart(2, '0')}.jpg`
 
-    // Fit the photo inside the screen opening, preserving its aspect ratio.
-    function fit(i) {
-      const img = document.getElementById('img' + i)
-      const ar = (img && img.naturalWidth) ? img.naturalWidth / img.naturalHeight : 1.5
-      let w = SCREEN_W, h = SCREEN_W / ar
-      if (h > SCREEN_H) { h = SCREEN_H; w = SCREEN_H * ar }
-      pic.setAttribute('geometry', `primitive: plane; width: ${w.toFixed(3)}; height: ${h.toFixed(3)}`)
+    // Cover-crop: scale the texture so the photo fills the whole plane with no
+    // white bars and no distortion (centre-crop the overflow).
+    function applyCover() {
+      const mesh = pic.getObject3D('mesh')
+      const map = mesh && mesh.material && mesh.material.map
+      if (!map || !map.image) return
+      const iar = map.image.width / map.image.height
+      const par = PLANE_W / PLANE_H
+      let rx = 1, ry = 1
+      if (iar > par) { rx = par / iar } else { ry = iar / par }
+      map.repeat.set(rx, ry)
+      map.offset.set((1 - rx) / 2, (1 - ry) / 2)
+      map.needsUpdate = true
     }
+    pic.addEventListener('materialtextureloaded', applyCover)
 
     function show(i) {
       idx = (i % COUNT + COUNT) % COUNT
-      const img = document.getElementById('img' + idx)
-      pic.setAttribute('material', 'src', '#img' + idx)
-      if (img && img.naturalWidth) fit(idx)
-      else if (img) img.addEventListener('load', () => fit(idx), { once: true })
-      if (hint) hint.textContent =
-        `Scene ${idx + 1}/${COUNT} · drag to move · pinch to zoom · tap for next`
+      if (idx >= STORY_FROM) {
+        // full-screen story slide
+        group.setAttribute('visible', 'false')
+        storyImg.src = fname(idx)
+        story.style.display = 'block'
+        if (hint) hint.textContent = `Story ${idx - STORY_FROM + 1}/${COUNT - STORY_FROM} · tap for next`
+      } else {
+        // photo on the 3D screen
+        story.style.display = 'none'
+        group.setAttribute('visible', 'true')
+        pic.setAttribute('material', 'src', '#img' + idx)
+        applyCover()
+        if (hint) hint.textContent = `Scene ${idx + 1}/${STORY_FROM} · drag · pinch · tap for next`
+      }
     }
 
     // ---- gestures ----
