@@ -31,9 +31,7 @@
       text-shadow: 0 1px 4px rgba(0,0,0,0.7);
     }
     /* Transparent full-screen layer that catches taps to change pose. */
-    #tapcatcher {
-      position: fixed; inset: 0; z-index: 3; background: transparent;
-    }
+    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; }
   </style>
 </head>
 <body>
@@ -43,28 +41,22 @@
     renderer="colorManagement: true"
     xrweb="allowedDevices: any">
 
-    <!-- The three poses, preloaded so swapping is instant -->
+    <!-- All three poses preloaded so switching is instant -->
     <a-assets>
       <a-asset-item id="pose0" src="../../model/taichi.glb?v=3"></a-asset-item>
       <a-asset-item id="pose1" src="../../model/taichi2.glb?v=1"></a-asset-item>
       <a-asset-item id="pose2" src="../../model/taichi3.glb?v=1"></a-asset-item>
     </a-assets>
 
-    <!-- Camera. The master is a CHILD of the camera, so it stays in front of
-         you and facing you no matter how you move ("head-locked"). Tapping
-         only swaps which pose model is shown — position/size never change.
-         Tune POSITION / ROTATION / SCALE below if needed:
-           position "0 -0.2 -2"  → x, up/down, distance-in-front
-           rotation "0 0 0"      → set "0 180 0" if his back faces you
-           scale    "3.4 ..."    → bigger/smaller -->
+    <!-- The master is head-locked to the camera (stays in front, facing you).
+         All three pose entities sit at the SAME position/rotation/scale; we just
+         show one at a time (toggling visibility — no model reloading), so each
+         pose appears in the exact same place and size.
+         Tune for all three together via the constants in poses.js. -->
     <a-camera position="0 0 0">
-      <a-entity
-        id="master"
-        gltf-model="#pose0"
-        position="0 -0.2 -2"
-        rotation="0 0 0"
-        scale="3.4 3.4 3.4">
-      </a-entity>
+      <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"></a-entity>
+      <a-entity class="pose" id="poseEntity1" gltf-model="#pose1" visible="false"></a-entity>
+      <a-entity class="pose" id="poseEntity2" gltf-model="#pose2" visible="false"></a-entity>
     </a-camera>
 
     <a-light type="ambient" intensity="0.85"></a-light>
