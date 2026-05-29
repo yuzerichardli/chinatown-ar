@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Chinatown AR</title>
+
+  <!-- model-viewer: Google's free web component for showing 3D + AR.
+       Loaded from a CDN, so there is nothing to install or build. -->
+  <script type="module"
+    src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
+  <style>
+    :root { --accent: #c8102e; }            /* a Chinatown red */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; font-family: -apple-system, system-ui, sans-serif; }
+    body { background: #111; color: #fff; overflow: hidden; }
+
+    model-viewer {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 30%, #2a2a2a, #111);
+    }
+
+    /* Loading bar shown while the model downloads */
+    .progress-bar {
+      position: absolute; top: 0; left: 0; height: 4px; width: 0%;
+      background: var(--accent); transition: width 0.2s; z-index: 10;
+    }
+
+    /* The "View in AR" button model-viewer shows on AR-capable phones */
+    .ar-button {
+      position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #fff; border: none;
+      padding: 12px 22px; border-radius: 999px; font-size: 16px; font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 10;
+    }
+
+    /* Info card overlaid at the bottom */
+    .card {
+      position: fixed; left: 12px; right: 12px; bottom: 12px;
+      background: rgba(20,20,20,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px; padding: 16px 18px; text-align: center; z-index: 10;
+    }
+    .card h1 { margin: 0 0 6px; font-size: 20px; }
+    .card p  { margin: 0; font-size: 14px; opacity: 0.85; line-height: 1.4; }
+    .hint { font-size: 12px; opacity: 0.55; margin-top: 8px; }
+    .credit { font-size: 10px; opacity: 0.4; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <!-- The 3D viewer. src + text get filled in by the script below
+       depending on which location's QR was scanned (?spot=...). -->
+  <model-viewer
+    id="viewer"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    camera-controls
+    touch-action="pan-y"
+    autoplay
+    shadow-intensity="1"
+    exposure="1"
+    alt="Chinatown AR character">
+
+    <button slot="ar-button" class="ar-button">📷 View in AR</button>
+    <div class="progress-bar" slot="progress-bar"></div>
+  </model-viewer>
+
+  <div class="card">
+    <h1 id="title">Chinatown AR</h1>
+    <p id="desc">Loading…</p>
+    <div class="hint" id="hint">Tap "View in AR", point at the ground, and step back.</div>
+    <div class="credit" id="credit"></div>
+  </div>
+
+  <script>
+    /* ----------------------------------------------------------------
+       LOCATIONS CONFIG
+       Each Chinatown spot gets one entry here. The QR code for a spot
+       points to this same page with ?spot=<key> on the end, e.g.
+         https://YOURSITE/?spot=taichi
+         https://YOURSITE/?spot=lion-dance
+       To add a spot: drop its .glb in the ../model/ folder and add an entry.
+       Model paths are relative to this file (code/), so they start with
+       ../model/  to reach the model/ folder next door.
+    ---------------------------------------------------------------- */
+    const LOCATIONS = {
+      taichi: {
+        title: "Morning Tai Chi",
+        desc: "Every morning, locals gather here to practice tai chi. Meet the master.",
+        model: "../model/taichi.glb",
+        credit: "",   // e.g. "3D model by <artist name>" if a license requires it
+      },
+      // Example for your next spot — add the .glb to ../model/ then uncomment:
+      // "lion-dance": {
+      //   title: "Lion Dance Corner",
+      //   desc: "During festivals, the lion dance winds through these streets.",
+      //   model: "../model/lion-dance.glb",
+      //   credit: "",
+      // },
+    };
+
+    const params = new URLSearchParams(location.search);
+    const key = params.get("spot");
+    const spot = LOCATIONS[key] || LOCATIONS.taichi;   // default if no/unknown ?spot
+
+    const viewer = document.getElementById("viewer");
+    viewer.src = spot.model;
+    document.getElementById("title").textContent = spot.title;
+    document.getElementById("desc").textContent = spot.desc;
+    document.getElementById("credit").textContent = spot.credit || "";
+    document.title = spot.title + " — Chinatown AR";
+
+    // Drive the loading bar so people know the model is downloading.
+    const bar = viewer.querySelector(".progress-bar");
+    viewer.addEventListener("progress", (e) => {
+      const pct = e.detail.totalProgress * 100;
+      bar.style.width = pct + "%";
+      if (pct >= 100) {
+        bar.style.opacity = "0";
+        document.getElementById("desc").textContent = spot.desc;
+      } else {
+        document.getElementById("desc").textContent = "Loading the scene…";
+      }
+    });
+  </script>
+</body>
+</html>
