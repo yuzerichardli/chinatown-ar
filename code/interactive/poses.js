@@ -12,9 +12,9 @@
   const THREE = AFRAME.THREE
 
   // ---- Tuning ----
-  const DIST = 1.3              // how far in front he is placed
+  const DIST = 2.2             // how far in front he is placed (further away)
   const Y_OFFSET = 0           // 0 = his center at your eye level
-  const SCALE = '3.6 3.6 3.6'  // bigger / smaller
+  const SCALE = '2.5 2.5 2.5'  // smaller
   // ----------------
 
   const IDS = ['poseEntity0', 'poseEntity1', 'poseEntity2']
