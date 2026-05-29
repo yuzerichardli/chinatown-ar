@@ -12,8 +12,8 @@
 
   // ---- Tuning ----
   const DIST = 2       // how far in front of you he spawns
-  const Y_OFFSET = -0.2  // up/down relative to camera height
-  const SCALE = '1.8 1.8 1.8'
+  const Y_OFFSET = 0     // 0 = his center sits at camera/eye level, directly in front
+  const SCALE = '2.5 2.5 2.5'  // a bit larger
   // ----------------
 
   const IDS = ['poseEntity0', 'poseEntity1', 'poseEntity2']
