@@ -14,12 +14,15 @@
   const IDS = ['herb0', 'herb1', 'herb2', 'herb3']
 
   let dragging = null, collected = 0, placed = false
+  let state = 'playing'   // playing -> soup -> story1 -> story2 -> (restart)
 
   window.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene')
     const surface = document.getElementById('dragsurface')
     const pot = document.getElementById('pot')
     const reveal = document.getElementById('reveal')
+    const story = document.getElementById('story')
+    const storyImg = document.getElementById('storyimg')
     const hint = document.getElementById('hint')
     const countEl = document.getElementById('count')
     const bowl = document.getElementById('bowl')
@@ -74,19 +77,46 @@
       return x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m
     }
 
+    // ---- post-game sequence: soup reveal -> 2 story slides -> restart ----
+    function showStory(n) {
+      reveal.style.opacity = '0'
+      storyImg.src = `stories/story${n}.jpg`
+      story.style.display = 'block'
+    }
+    function restart() {
+      reveal.style.opacity = '0'
+      story.style.display = 'none'
+      bowl.textContent = '🥣'
+      collected = 0; countEl.textContent = '0/4'
+      ents.forEach((e) => {
+        delete e.dataset.done
+        e.setAttribute('visible', 'true')
+        e.setAttribute('scale', '0.25 0.25 0.25')
+      })
+      layout()
+      if (hint) hint.textContent = 'Drag each ingredient into the soup pot'
+      state = 'playing'
+    }
+    function advancePost() {
+      if (state === 'soup') { showStory(1); state = 'story1' }
+      else if (state === 'story1') { showStory(2); state = 'story2' }
+      else if (state === 'story2') { restart() }
+    }
+
     surface.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) return
+      if (state !== 'playing' || e.touches.length !== 1) return
       dragging = pickHerb(e.touches[0].clientX, e.touches[0].clientY)
     }, { passive: false })
 
     surface.addEventListener('touchmove', (e) => {
-      if (!dragging) return
+      if (state !== 'playing' || !dragging) return
       const f = fingerLocal(e.touches[0].clientX, e.touches[0].clientY)
       dragging.object3D.position.set(f.x, f.y, -D)
       e.preventDefault()
     }, { passive: false })
 
     surface.addEventListener('touchend', (e) => {
+      if (state !== 'playing') { advancePost(); return }   // soup/story taps
       if (!dragging) return
       const t = e.changedTouches[0]
       if (overPot(t.clientX, t.clientY)) {
@@ -103,6 +133,7 @@
         if (collected >= 4) {
           bowl.textContent = '🍲'        // empty bowl -> full soup
           reveal.style.opacity = '1'     // show the full herbal-soup image
+          state = 'soup'                 // now taps advance through the stories
           if (hint) hint.textContent = ''
         } else if (hint) {
           hint.textContent = `${4 - collected} more to go…`
