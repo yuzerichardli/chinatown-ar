@@ -78,7 +78,7 @@
     }
 
     // Bubbles + bowl bounce when an ingredient is added (simmering-soup feel)
-    function splash() {
+    function splash(bounce = true) {
       const r = pot.getBoundingClientRect()
       const cx = r.left + r.width / 2, top = r.top + r.height * 0.4
       for (let i = 0; i < 9; i++) {
@@ -93,9 +93,11 @@
         document.body.appendChild(b)
         setTimeout(() => b.remove(), 1300)
       }
-      bowl.classList.remove('plop')
-      void bowl.offsetWidth          // restart the animation
-      bowl.classList.add('plop')
+      if (bounce) {
+        bowl.classList.remove('plop')
+        void bowl.offsetWidth        // restart the animation
+        bowl.classList.add('plop')
+      }
     }
 
     // ---- post-game sequence: soup reveal -> 2 story slides -> restart ----
@@ -153,10 +155,17 @@
         collected++
         countEl.textContent = `${collected}/4`
         if (collected >= 4) {
-          bowl.textContent = '🍲'        // empty bowl -> full soup
-          reveal.style.opacity = '1'     // show the full herbal-soup image
-          state = 'soup'                 // now taps advance through the stories
-          if (hint) hint.textContent = ''
+          // brewing moment: keep bubbling for a couple seconds, then soup is ready
+          state = 'brewing'
+          if (hint) hint.textContent = 'Brewing…'
+          let n = 0
+          const brew = setInterval(() => { splash(false); if (++n >= 9) clearInterval(brew) }, 270)
+          setTimeout(() => {
+            bowl.textContent = '🍲'        // empty bowl -> full soup
+            reveal.style.opacity = '1'     // reveal the finished herbal soup
+            state = 'soup'                 // now taps advance through the stories
+            if (hint) hint.textContent = ''
+          }, 2700)
         } else if (hint) {
           hint.textContent = `${4 - collected} more to go…`
         }
