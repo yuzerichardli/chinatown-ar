@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Chinatown AR — Films at the Gate</title>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <!-- 8th Wall WebAR stack (same as the tai-chi scene) -->
+  <script src="./vendor/8frame-1.3.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js"
+          crossorigin="anonymous"></script>
+  <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
+          crossorigin="anonymous" data-preload-chunks="slam"></script>
+
+  <script src="./screen.js?v=1"></script>
+
+  <style>
+    #hint {
+      position: fixed; left: 0; right: 0; bottom: 28px; text-align: center;
+      pointer-events: none; font-family: -apple-system, system-ui, sans-serif;
+      color: #fff; font-size: 16px; padding: 0 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+    }
+    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; }
+  </style>
+</head>
+<body>
+  <a-scene
+    xrextras-loading
+    xrextras-runtime-error
+    renderer="colorManagement: true"
+    xrweb="allowedDevices: any; scale: absolute">
+
+    <!-- All photos preloaded so swapping is instant -->
+    <a-assets>
+      <img id="img0" src="pictures/pic01.jpg" crossorigin="anonymous">
+      <img id="img1" src="pictures/pic02.jpg" crossorigin="anonymous">
+      <img id="img2" src="pictures/pic03.jpg" crossorigin="anonymous">
+      <img id="img3" src="pictures/pic04.jpg" crossorigin="anonymous">
+      <img id="img4" src="pictures/pic05.jpg" crossorigin="anonymous">
+      <img id="img5" src="pictures/pic06.jpg" crossorigin="anonymous">
+      <img id="img6" src="pictures/pic07.jpg" crossorigin="anonymous">
+      <img id="img7" src="pictures/pic08.jpg" crossorigin="anonymous">
+      <img id="img8" src="pictures/pic09.jpg" crossorigin="anonymous">
+      <img id="img9" src="pictures/pic10.jpg" crossorigin="anonymous">
+    </a-assets>
+
+    <!-- The screen is a single flat panel. Its texture IS the photo, so screen
+         and image always move/zoom together and fit perfectly. It's on a rig
+         attached to the camera, so it's steady (no world-tracking drift):
+           drag  -> orbit it around you   (screen.js)
+           pinch -> zoom
+           tap   -> next photo (the plane resizes to that photo's shape) -->
+    <a-camera position="0 0 0">
+      <a-entity id="orbitRig" rotation="0 0 0">
+        <a-entity id="screen"
+                  position="0 0 -2.5"
+                  geometry="primitive: plane; width: 2.25; height: 1.5"
+                  material="shader: flat; src: #img0; side: double"></a-entity>
+      </a-entity>
+    </a-camera>
+
+    <a-light type="ambient" intensity="1.0"></a-light>
+  </a-scene>
+
+  <div id="tapcatcher"></div>
+  <div id="hint">Drag to move · pinch to zoom · tap for next photo</div>
+</body>
+</html>
