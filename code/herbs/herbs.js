@@ -19,7 +19,7 @@
     const scene = document.querySelector('a-scene')
     const surface = document.getElementById('dragsurface')
     const pot = document.getElementById('pot')
-    const flash = document.getElementById('flash')
+    const reveal = document.getElementById('reveal')
     const hint = document.getElementById('hint')
     const countEl = document.getElementById('count')
     const bowl = document.getElementById('bowl')
@@ -91,12 +91,18 @@
       const t = e.changedTouches[0]
       if (overPot(t.clientX, t.clientY)) {
         dragging.dataset.done = '1'
-        dragging.setAttribute('visible', 'false')
+        // settle the ingredient into the bowl: shrink it and cluster it just
+        // above the bowl rim so it visibly piles up (stays visible)
+        const r = pot.getBoundingClientRect()
+        const ox = [-46, -16, 16, 46][collected] || 0
+        const f = fingerLocal(r.left + r.width / 2 + ox, r.top - 14)
+        dragging.object3D.position.set(f.x, f.y, -D)
+        dragging.setAttribute('scale', '0.11 0.11 0.11')
         collected++
         countEl.textContent = `${collected}/4`
         if (collected >= 4) {
           bowl.textContent = '🍲'        // empty bowl -> full soup
-          flash.style.opacity = '1'
+          reveal.style.opacity = '1'     // show the full herbal-soup image
           if (hint) hint.textContent = ''
         } else if (hint) {
           hint.textContent = `${4 - collected} more to go…`
