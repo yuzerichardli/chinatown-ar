@@ -13,7 +13,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./herbs.js?v=4"></script>
+  <script src="./herbs.js?v=5"></script>
 
   <style>
     body { margin: 0; }
@@ -34,6 +34,23 @@
     #pot #count {
       color: #fff; font: 700 18px -apple-system, system-ui, sans-serif;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8); margin-top: -8px;
+    }
+    /* soup bubbles that rise from the bowl when an ingredient is added */
+    .bubble {
+      position: fixed; z-index: 5; pointer-events: none; border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(210,230,255,0.55));
+      box-shadow: 0 0 4px rgba(255,255,255,0.5);
+      animation: bubbleUp 1s ease-out forwards;
+    }
+    @keyframes bubbleUp {
+      0%   { transform: translate(0, 0) scale(0.3); opacity: 0; }
+      20%  { opacity: 0.95; }
+      100% { transform: translate(var(--drift, 0), -85px) scale(1.1); opacity: 0; }
+    }
+    /* bowl bounce ("plop") on each drop */
+    .bowl.plop { animation: plop 0.4s ease; }
+    @keyframes plop {
+      0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); }
     }
     /* full-screen story slides after the soup (camera stays behind) */
     #story {

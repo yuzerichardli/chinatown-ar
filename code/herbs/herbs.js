@@ -77,6 +77,27 @@
       return x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m
     }
 
+    // Bubbles + bowl bounce when an ingredient is added (simmering-soup feel)
+    function splash() {
+      const r = pot.getBoundingClientRect()
+      const cx = r.left + r.width / 2, top = r.top + r.height * 0.4
+      for (let i = 0; i < 9; i++) {
+        const b = document.createElement('div')
+        b.className = 'bubble'
+        const size = 6 + Math.random() * 13
+        b.style.width = b.style.height = size + 'px'
+        b.style.left = (cx + (Math.random() - 0.5) * r.width * 0.55 - size / 2) + 'px'
+        b.style.top = top + 'px'
+        b.style.animationDelay = (Math.random() * 0.18) + 's'
+        b.style.setProperty('--drift', ((Math.random() - 0.5) * 50) + 'px')
+        document.body.appendChild(b)
+        setTimeout(() => b.remove(), 1300)
+      }
+      bowl.classList.remove('plop')
+      void bowl.offsetWidth          // restart the animation
+      bowl.classList.add('plop')
+    }
+
     // ---- post-game sequence: soup reveal -> 2 story slides -> restart ----
     function showStory(n) {
       reveal.style.opacity = '0'
@@ -128,6 +149,7 @@
         const f = fingerLocal(r.left + r.width / 2 + ox, r.top - 14)
         dragging.object3D.position.set(f.x, f.y, -D)
         dragging.setAttribute('scale', '0.11 0.11 0.11')
+        splash()                       // bubbles + bowl bounce
         collected++
         countEl.textContent = `${collected}/4`
         if (collected >= 4) {
