@@ -4,3 +4,6 @@
 # Raw source models (heavy OBJ/zip exports) — keep local; only optimized GLBs
 # that the scene actually uses get committed.
 model/3D/
+
+# Local Python venv for the asset pipeline (recreate with tools/setup_env.sh)
+.venv/
