@@ -104,6 +104,7 @@
     function showStory(n) {
       reveal.style.opacity = '0'
       pot.style.display = 'none'
+      ents.forEach((e) => e.setAttribute('visible', 'false'))
       storyImg.src = `stories/story${n}.jpg`
       story.style.display = 'block'
     }
