@@ -103,12 +103,14 @@
     // ---- post-game sequence: soup reveal -> 2 story slides -> restart ----
     function showStory(n) {
       reveal.style.opacity = '0'
+      pot.style.display = 'none'
       storyImg.src = `stories/story${n}.jpg`
       story.style.display = 'block'
     }
     function restart() {
       reveal.style.opacity = '0'
       story.style.display = 'none'
+      pot.style.display = ''
       collected = 0; countEl.textContent = '0/4'
       ents.forEach((e) => {
         delete e.dataset.done

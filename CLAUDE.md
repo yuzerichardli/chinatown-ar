@@ -54,7 +54,7 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - 8 photos on the screen → **2 full-screen story slides** (camera shows behind, transparent) → loops.
 - Photos: `code/screen/pictures/pic01.jpg … pic10.jpg` (pic09/pic10 are the story slides).
 
-### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=7`)
+### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=8`)
 - **Most interactive.** 4 herbs float (head-locked); **finger-drag each into the Chinese clay pot** at the bottom. Each drop → **bubbles + pot bounce** (`splash()`); ingredient piles at the rim. Pot art: `assets/herbal-pot.png` (transparent PNG).
 - After the **4th** drop → ~2.5s **brewing** (continuous bubbles) → fades to a **full-soup reveal** (`assets/soup_transition.jpg`) → **tap → 2 story slides** (`stories/story1.jpg`, `story2.jpg`) → **tap → restart** the game.
 - State machine in `herbs.js`: `playing → brewing → soup → story1 → story2 → (restart)`.
