@@ -54,9 +54,9 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - 8 photos on the screen → **2 full-screen story slides** (camera shows behind, transparent) → loops.
 - Photos: `code/screen/pictures/pic01.jpg … pic10.jpg` (pic09/pic10 are the story slides).
 
-### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=6`)
-- **Most interactive.** 4 herbs float (head-locked); **finger-drag each into the 🥣 pot** at the bottom. Each drop → **bubbles + bowl bounce** (`splash()`); ingredient piles at the rim.
-- After the **4th** drop → ~2.5s **brewing** (continuous bubbles) → fades to a **full-soup reveal** (`assets/soup.jpg`, a free Pexels photo) → **tap → 2 story slides** (`stories/story1.jpg`, `story2.jpg`) → **tap → restart** the game.
+### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=7`)
+- **Most interactive.** 4 herbs float (head-locked); **finger-drag each into the Chinese clay pot** at the bottom. Each drop → **bubbles + pot bounce** (`splash()`); ingredient piles at the rim. Pot art: `assets/herbal-pot.png` (transparent PNG).
+- After the **4th** drop → ~2.5s **brewing** (continuous bubbles) → fades to a **full-soup reveal** (`assets/soup_transition.jpg`) → **tap → 2 story slides** (`stories/story1.jpg`, `story2.jpg`) → **tap → restart** the game.
 - State machine in `herbs.js`: `playing → brewing → soup → story1 → story2 → (restart)`.
 - Models: `model/herbs/{jujubes,goji,ginseng,breadsticks}.glb` (decimated to ~100k faces each).
 
@@ -122,7 +122,7 @@ See `tools/README.md` for exact commands.
 
 **Not done / ideas:**
 - **QR codes:** only `qr/taichi.png` exists, and it points at the *old* simple tour (`/code/?spot=taichi`). The 3 main scenes have **no QR codes yet** — generate them (see how `qr/taichi.png` was made: an `api.qrserver.com` PNG of the scene URL).
-- Replace the herb 🥣/🍲 **emoji with real pot art**; add a drop **sound**; per-herb **size tuning**.
+- Add a drop **sound**; per-herb **size tuning**.
 - Optional: revisit world-anchored AR (image-target markers) if rock-solid spatial anchoring is ever needed — current scenes are deliberately camera-relative.
 
 ---

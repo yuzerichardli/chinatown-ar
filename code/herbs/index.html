@@ -13,7 +13,7 @@
   <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
           crossorigin="anonymous" data-preload-chunks="slam"></script>
 
-  <script src="./herbs.js?v=6"></script>
+  <script src="./herbs.js?v=7"></script>
 
   <style>
     body { margin: 0; }
@@ -30,7 +30,21 @@
       position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
       z-index: 4; pointer-events: none; text-align: center; line-height: 1;
     }
-    #pot .bowl { font-size: 150px; filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)); }
+    #pot .bowl {
+      position: relative; display: block; width: min(48vw, 190px);
+      transform-origin: 50% 70%;
+      filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
+    }
+    #pot .pot-image { display: block; width: 100%; height: auto; }
+    #pot .pot-water {
+      position: absolute; left: 18%; top: 10.5%; width: 64%; height: 10%;
+      border-radius: 50%; pointer-events: none;
+      background: radial-gradient(ellipse at 50% 18%,
+        rgba(205,240,242,0.9), rgba(71,137,151,0.82) 55%, rgba(20,61,73,0.94));
+      border: 1px solid rgba(230,250,250,0.45);
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 1px 4px rgba(0,0,0,0.45);
+      animation: waterShimmer 3.2s ease-in-out infinite;
+    }
     #pot #count {
       color: #fff; font: 700 18px -apple-system, system-ui, sans-serif;
       text-shadow: 0 1px 4px rgba(0,0,0,0.8); margin-top: -8px;
@@ -50,7 +64,11 @@
     /* bowl bounce ("plop") on each drop */
     .bowl.plop { animation: plop 0.4s ease; }
     @keyframes plop {
-      0% { transform: scale(1); } 40% { transform: scale(1.18); } 100% { transform: scale(1); }
+      0% { transform: scale(1); } 40% { transform: scale(1.1); } 100% { transform: scale(1); }
+    }
+    @keyframes waterShimmer {
+      0%, 100% { transform: scaleX(1); opacity: 0.82; }
+      50% { transform: translateY(1px) scaleX(0.97); opacity: 0.96; }
     }
     /* full-screen story slides after the soup (camera stays behind) */
     #story {
@@ -65,10 +83,11 @@
     }
     #reveal img { width: 100%; height: 100%; object-fit: cover; }
     #reveal .cap {
-      position: absolute; bottom: 9%; left: 0; right: 0; text-align: center;
+      position: absolute; bottom: 6%; left: 0; right: 0; text-align: center;
       color: #fff; font: 700 26px -apple-system, system-ui, sans-serif;
       text-shadow: 0 2px 8px rgba(0,0,0,0.9);
     }
+    #reveal .cap-action { margin-top: 8px; font-size: 18px; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -100,8 +119,20 @@
   </a-scene>
 
   <div id="dragsurface"></div>
-  <div id="pot"><div class="bowl" id="bowl">🥣</div><div id="count">0/4</div></div>
-  <div id="reveal"><img src="assets/soup.jpg" alt="herbal soup"><div class="cap">Herbal soup ready! 🍲 — tap to continue</div></div>
+  <div id="pot">
+    <div class="bowl" id="bowl">
+      <img class="pot-image" src="assets/herbal-pot.png" alt="Chinese clay soup pot" draggable="false">
+      <div class="pot-water"></div>
+    </div>
+    <div id="count">0/4</div>
+  </div>
+  <div id="reveal">
+    <img src="assets/soup_transition.jpg" alt="herbal soup">
+    <div class="cap">
+      <div>Herbal soup ready!</div>
+      <div class="cap-action">tap to continue</div>
+    </div>
+  </div>
   <div id="story"><img id="storyimg" alt="story"></div>
   <div id="hint">Drag each ingredient into the soup pot</div>
 </body>

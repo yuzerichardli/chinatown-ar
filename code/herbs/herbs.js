@@ -1,7 +1,7 @@
 /* Herbal-soup mini-game.
    Four herbs float in front of you (head-locked to the camera). Drag each one
    with your finger down into the soup pot pinned at the bottom of the screen.
-   When all 4 are in, the screen flashes white (placeholder for the real reveal).
+   When all 4 are in, the soup brews and transitions to the finished reveal.
 
    Dragging is done in screen space: a herb sits at a fixed depth D in front of
    the camera, and we map the finger's screen position to that depth so the herb
@@ -14,7 +14,7 @@
   const IDS = ['herb0', 'herb1', 'herb2', 'herb3']
 
   let dragging = null, collected = 0, placed = false
-  let state = 'playing'   // playing -> soup -> story1 -> story2 -> (restart)
+  let state = 'playing'   // playing -> brewing -> soup -> story1 -> story2 -> (restart)
 
   window.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene')
@@ -73,14 +73,14 @@
     }
 
     function overPot(x, y) {
-      const r = pot.getBoundingClientRect(), m = 50
+      const r = bowl.getBoundingClientRect(), m = 50
       return x > r.left - m && x < r.right + m && y > r.top - m && y < r.bottom + m
     }
 
     // Bubbles + bowl bounce when an ingredient is added (simmering-soup feel)
     function splash(bounce = true) {
-      const r = pot.getBoundingClientRect()
-      const cx = r.left + r.width / 2, top = r.top + r.height * 0.4
+      const r = bowl.getBoundingClientRect()
+      const cx = r.left + r.width / 2, top = r.top + r.height * 0.16
       for (let i = 0; i < 9; i++) {
         const b = document.createElement('div')
         b.className = 'bubble'
@@ -109,7 +109,6 @@
     function restart() {
       reveal.style.opacity = '0'
       story.style.display = 'none'
-      bowl.textContent = '🥣'
       collected = 0; countEl.textContent = '0/4'
       ents.forEach((e) => {
         delete e.dataset.done
@@ -146,9 +145,9 @@
         dragging.dataset.done = '1'
         // settle the ingredient into the bowl: shrink it and cluster it just
         // above the bowl rim so it visibly piles up (stays visible)
-        const r = pot.getBoundingClientRect()
-        const ox = [-46, -16, 16, 46][collected] || 0
-        const f = fingerLocal(r.left + r.width / 2 + ox, r.top - 14)
+        const r = bowl.getBoundingClientRect()
+        const ox = [-0.18, -0.06, 0.06, 0.18][collected] * r.width || 0
+        const f = fingerLocal(r.left + r.width / 2 + ox, r.top - 8)
         dragging.object3D.position.set(f.x, f.y, -D)
         dragging.setAttribute('scale', '0.11 0.11 0.11')
         splash()                       // bubbles + bowl bounce
@@ -161,7 +160,6 @@
           let n = 0
           const brew = setInterval(() => { splash(false); if (++n >= 9) clearInterval(brew) }, 270)
           setTimeout(() => {
-            bowl.textContent = '🍲'        // empty bowl -> full soup
             reveal.style.opacity = '1'     // reveal the finished herbal soup
             state = 'soup'                 // now taps advance through the stories
             if (hint) hint.textContent = ''
