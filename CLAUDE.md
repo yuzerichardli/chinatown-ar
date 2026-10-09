@@ -1,7 +1,7 @@
 # AR Chinatown — Project Guide & Handoff
 
 A **no-install WebAR tour of Chinatown**: a visitor scans a QR code → it opens in
-their phone browser → an interactive AR scene runs (no app). There are **3 scenes**,
+their phone browser → an interactive AR scene runs (no app). There are **5 scenes**,
 hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 
 > **New machine / new agent: read this whole file first.** Then run
@@ -24,6 +24,7 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 | 🎬 Movie screen (Films at the Gate) | `/code/screen/` | 8th Wall |
 | 🌿 Herbal soup game | `/code/herbs/` | Standard A-Frame + plain camera video |
 | 🦁 Lion dance (Phillips Square) | `/code/lion/` | Plain HTML + camera video |
+| 🥟 Dim sum (Share the Table) | `/code/dimsum/` | Plain HTML + camera video |
 | (original simple tour) | `/code/?spot=taichi` | `<model-viewer>` |
 
 ---
@@ -41,7 +42,7 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 
 ---
 
-## 3. The three scenes (files + behavior)
+## 3. The scenes (files + behavior)
 
 All 8th Wall scenes share the gesture model: **drag = orbit the object around you, pinch = zoom, tap = advance.**
 
@@ -66,6 +67,15 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - Models: `model/herbs/{jujubes,goji,ginseng,breadsticks}.glb` (decimated to ~100k faces each).
 
 ---
+
+### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=2`)
+- Same simple interaction pattern as herbs: **drag four dishes onto one shared table** (or tap a dish, then the table).
+- No matching requests, tray rotation, tea-pouring stage, timer, or score. The teapot is decorative.
+- Opens with **"Are you at a dim sum restaurant?" → Yes**; no restaurant has been chosen or location detected.
+- After four dishes → **"Dim sum ready!"** → Continue → English, Chinese, bilingual reflection → Replay.
+- All game elements, counters, and the camera are hidden during the story. Replay clears the table.
+- Photographic transparent food assets are in `code/dimsum/assets/`; generation prompts and story context are documented in its `README.md`.
+- QR: `qr/dimsum.png` → `/code/dimsum/`. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 
 ## 4. Where the assets live  (IMPORTANT for continuity)
 
@@ -123,10 +133,10 @@ See `tools/README.md` for exact commands.
 
 ## 8. Status & possible next steps
 
-**Done:** all 3 scenes work end-to-end (interactions + story slides + loops + the herb-soup animations/brewing/reveal). Materials fixed, models optimized, everything deployed & live.
+**Done:** the original scenes plus lion dance and the simple dim sum sharing scene. Materials fixed, models optimized. Each scene has a QR in `qr/`.
 
 **Not done / ideas:**
-- **QR codes:** only `qr/taichi.png` exists, and it points at the *old* simple tour (`/code/?spot=taichi`). The 3 main scenes have **no QR codes yet** — generate them (see how `qr/taichi.png` was made: an `api.qrserver.com` PNG of the scene URL).
+- Choose the dim sum restaurant and replace its generic arrival question with the agreed location.
 - Add a drop **sound**; per-herb **size tuning**.
 - Optional: revisit world-anchored AR (image-target markers) if rock-solid spatial anchoring is ever needed — current scenes are deliberately camera-relative.
 

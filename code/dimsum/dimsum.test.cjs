@@ -1,0 +1,86 @@
+const assert = require('node:assert/strict');
+const test = require('node:test');
+const fs = require('node:fs');
+const vm = require('node:vm');
+const { createGame, dishes } = require('./game.js');
+
+test('four dishes, one table; no duplicate shares or premature Continue', () => {
+  const game = createGame(); game.read(); assert.equal(game.state.phase, 'arrival');
+  assert.equal(game.share('har-gow'), false); game.start();
+  assert.equal(game.share('missing'), false);
+  dishes.forEach(d => {assert.equal(game.share(d.id), true); assert.equal(game.share(d.id), false);});
+  assert.equal(game.state.phase, 'ready'); assert.equal(game.state.shared.length, 4);
+  game.read(); assert.equal(game.state.phase, 'story'); game.returnToTable(); assert.equal(game.state.phase, 'ready');
+  game.reset(); game.start(); assert.deepEqual(game.state, {phase:'sharing', selected:null, shared:[]});
+});
+test('selection toggles and clears when a dish is shared', () => {
+  const game = createGame(); game.start(); game.select('har-gow'); assert.equal(game.state.selected, 'har-gow');
+  game.select('har-gow'); assert.equal(game.state.selected, null);
+  game.select('har-gow'); game.share('har-gow'); assert.equal(game.state.selected, null);
+  assert.equal(game.select('har-gow'), false); assert.equal(game.select('missing'), false);
+});
+function element() {
+  const events = {}, selectors = new Map(), classes = new Set(), captured = new Set();
+  return {
+    hidden:false, disabled:false, complete:true, naturalWidth:640, dataset:{}, style:{}, children:[],
+    rect:{left:0,top:0,right:100,bottom:100,width:100,height:100}, textContent:'', innerHTML:'',
+    classList:{add(...names){names.forEach(n=>classes.add(n));},remove(...names){names.forEach(n=>classes.delete(n));},
+      toggle(name,force){if(force ?? !classes.has(name)) classes.add(name); else classes.delete(name);},contains(n){return classes.has(n);}},
+    setAttribute(){}, querySelector(s){if(!selectors.has(s)) selectors.set(s,element());return selectors.get(s);},
+    append(child){this.children.push(child);},replaceChildren(){this.children=[];},remove(){this.removed=true;},focus(){this.focused=true;},
+    getBoundingClientRect(){return this.rect;},setPointerCapture(id){captured.add(id);},hasPointerCapture(id){return captured.has(id);},releasePointerCapture(id){captured.delete(id);},
+    play:async()=>{},addEventListener(n,f){(events[n] ||= []).push(f);},
+    fire(n,e={}){if(n==='click'&&this.disabled)return;for(const f of events[n]||[])f({preventDefault(){},detail:0,...e});}
+  };
+}
+function harness(mediaDevices) {
+  const ids=['arrival','arrive','camera','experience','board','dishes','shared-table','teapot','shared-dishes','table-hint','tap-hint','status','scene-title','instruction','instruction-zh','counter','continue','camera-controls','enable-camera','camera-status','reading','page','back','next'];
+  const el=Object.fromEntries(ids.map(id=>[id,element()]));el.experience.hidden=true;el.reading.hidden=true;
+  const document=element(),window=element();document.hidden=false;document.body=element();
+  document.getElementById=id=>el[id];document.createElement=()=>element();let game;
+  window.DimSumGame={...require('./game.js'),createGame(){game=createGame();return game;}};
+  vm.runInNewContext(fs.readFileSync(__dirname+'/dimsum.js','utf8'),{document,window,navigator:{mediaDevices},performance:{now:()=>0}});
+  const dish=id=>el.dishes.children.find(n=>n.dataset.dish===id);
+  const shareAll=()=>dishes.forEach(d=>{dish(d.id).fire('click');el['shared-table'].fire('click');});
+  return {el,document,window,game,dish,shareAll};
+}
+const down={isPrimary:true,button:0,pointerId:1,clientX:200,clientY:200};
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+test('controller: tap to share, completion, clean story screens, EN/ZH/reflection, Back, Replay',()=>{
+  const h=harness();h.el.arrive.fire('click');h.shareAll();
+  assert.equal(h.game.state.phase,'ready');assert.equal(h.el.continue.hidden,false);assert.equal(h.el.counter.hidden,true);
+  assert.equal(h.el['shared-dishes'].children.length,4);assert.equal(h.el['scene-title'].textContent,'Dim sum ready!');
+  h.el.continue.fire('click');assert.equal(h.el.experience.hidden,true);assert.equal(h.el['camera-controls'].hidden,true);assert.equal(h.el.camera.hidden,true);
+  assert.equal(h.el.reading.hidden,false);assert.match(h.el.page.innerHTML,/More than a meal/);
+  h.el.back.fire('click');assert.equal(h.game.state.phase,'ready');assert.equal(h.el['shared-dishes'].children.length,4);
+  h.el.continue.fire('click');h.el.next.fire('click');assert.equal(h.el.page.lang,'zh-Hans');assert.match(h.el.page.innerHTML,/不只是一顿饭/);
+  h.el.next.fire('click');assert.match(h.el.page.innerHTML,/Who would you invite/);h.el.next.fire('click');
+  assert.equal(h.game.state.phase,'sharing');assert.equal(h.el.reading.hidden,true);assert.equal(h.el.experience.hidden,false);
+  assert.equal(h.el['shared-dishes'].children.length,0);assert.equal(h.el.counter.hidden,false);assert.equal(h.el['camera-controls'].hidden,false);
+  dishes.forEach(d=>assert.equal(h.dish(d.id).hidden,false));
+});
+test('controller: drag/drop, outside drop, cancellation and blur restore dishes',()=>{
+  const h=harness();h.el.arrive.fire('click');const dish=h.dish('har-gow');
+  dish.fire('pointerdown',down);dish.fire('pointermove',{...down,clientX:50,clientY:50});
+  assert.equal(dish.classList.contains('dragging'),true);dish.fire('pointercancel',down);
+  assert.equal(dish.classList.contains('dragging'),false);assert.equal(h.document.body.children[0].removed,true);
+  dish.fire('pointerdown',down);dish.fire('pointermove',{...down,clientX:250,clientY:250});dish.fire('pointerup',{...down,clientX:250,clientY:250});
+  assert.equal(h.game.state.shared.length,0);
+  dish.fire('pointerdown',down);dish.fire('pointermove',{...down,clientX:50,clientY:50});h.window.fire('blur');
+  assert.equal(dish.classList.contains('dragging'),false);
+  dish.fire('pointerdown',down);dish.fire('pointermove',{...down,clientX:50,clientY:50});dish.fire('pointerup',{...down,clientX:50,clientY:50});
+  assert.equal(h.game.state.shared.length,1);assert.equal(dish.hidden,true);
+});
+test('controller: late camera permission cannot put the scene over the story',async()=>{
+  let resolve,stopped=0;const h=harness({getUserMedia:()=>new Promise(r=>{resolve=r;})});
+  h.el.arrive.fire('click');h.shareAll();h.el.continue.fire('click');
+  resolve({getTracks:()=>[{stop(){stopped++;}}]});await flush();
+  assert.equal(stopped,1);assert.equal(h.el.camera.srcObject,null);assert.equal(h.el.experience.hidden,true);assert.equal(h.el['enable-camera'].disabled,false);
+});
+test('controller: camera denial still permits playing; camera off stays off on resume',async()=>{
+  const h=harness({getUserMedia:async()=>{throw Error('Denied');}});h.el.arrive.fire('click');await flush();
+  assert.equal(h.el['enable-camera'].disabled,false);assert.match(h.el['camera-status'].textContent,/still play/);assert.equal(h.dish('har-gow').disabled,false);
+  let opened=0,stopped=0;const k=harness({getUserMedia:async()=>{opened++;return {getTracks:()=>[{stop(){stopped++;}}]};}});
+  k.el.arrive.fire('click');await flush();k.el['enable-camera'].fire('click');assert.equal(stopped,1);
+  k.document.hidden=true;k.document.fire('visibilitychange');k.document.hidden=false;k.document.fire('visibilitychange');await flush();assert.equal(opened,1);
+});
