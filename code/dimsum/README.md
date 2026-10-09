@@ -1,9 +1,8 @@
 # Dim sum — Share the Table
 
 Live: https://yuzerichardli.github.io/chinatown-ar/code/dimsum/
-QR: `../../qr/restaurant.png` (same directory as the other scene QR codes).
-This separate, newly generated code opens the dim sum activity above.
-The original `dimsum.png` and every other scene QR image remain unchanged.
+QR: `../../qr/dimsum.png` (same directory as the other scene QR codes).
+This existing QR opens the latest deployed version of the dim sum activity.
 
 One simple interaction, following the herbal-soup game: drag four dishes onto
 one shared table. No matching requests, rotation, timer, score, or tea-pouring
