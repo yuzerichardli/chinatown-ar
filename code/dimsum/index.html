@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#843a2e">
   <meta name="description" content="Bring four dim sum dishes to a shared table in this simple Chinatown AR mini game.">
   <title>Dim Sum · Share the Table</title>
-  <link rel="stylesheet" href="dimsum.css?v=4">
-  <script src="game.js?v=3" defer></script>
-  <script src="dimsum.js?v=4" defer></script>
+  <link rel="stylesheet" href="dimsum.css?v=5">
+  <script src="game.js?v=4" defer></script>
+  <script src="dimsum.js?v=5" defer></script>
 </head>
 <body>
   <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
@@ -20,11 +20,11 @@
     </section>
 
     <section id="experience" hidden aria-label="Dim sum sharing">
-      <div id="board" aria-label="Four dim sum dishes and a shared table">
+      <div id="board" aria-label="Four dim sum dishes and a lazy Susan table">
         <div id="dishes"></div>
-        <button id="shared-table" aria-label="Place the selected dish on the shared table">
-          <span class="table-surface" aria-hidden="true"></span>
-          <img id="teapot" src="assets/teapot.png" alt="" draggable="false">
+        <button id="shared-table" aria-label="Place the selected dish on the lazy Susan">
+          <img id="table-surface" src="assets/lazy-susan.png" alt="" draggable="false">
+          <img id="teapot" src="assets/teapot-3d.png" alt="" draggable="false">
           <span id="shared-dishes" aria-hidden="true"></span>
         </button>
       </div>

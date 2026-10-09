@@ -5,10 +5,10 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
   const dishes = [
-    { id: 'har-gow', en: 'Har gow', zh: '虾饺' },
-    { id: 'siu-mai', en: 'Siu mai', zh: '烧卖' },
-    { id: 'char-siu-bao', en: 'Char siu bao', zh: '叉烧包' },
-    { id: 'egg-tart', en: 'Egg tart', zh: '蛋挞' }
+    { id: 'har-gow', en: 'Har gow', zh: '虾饺', asset: 'har-gow-3d.png' },
+    { id: 'siu-mai', en: 'Siu mai', zh: '烧卖', asset: 'siu-mai-3d.png' },
+    { id: 'char-siu-bao', en: 'Char siu bao', zh: '叉烧包', asset: 'char-siu-bao-3d.png' },
+    { id: 'egg-tart', en: 'Egg tart', zh: '蛋挞', asset: 'egg-tart-3d.png' }
   ];
   function createGame() {
     let state;

@@ -3,6 +3,7 @@
   const $ = id => document.getElementById(id);
   const { dishes, createGame } = window.DimSumGame;
   const game = createGame(), dishNodes = new Map();
+  const dishAssets = new Map(dishes.map(dish => [dish.id, `assets/${dish.asset}`]));
   let ready = false, drag = null, lastDragAt = -Infinity, pageIndex = 0;
   let stream = null, cameraRequest = 0, cameraPending = false, cameraWanted = false;
   const pages = [
@@ -31,7 +32,7 @@
     node.className = 'dish'; node.dataset.dish = dish.id; node.disabled = true;
     node.setAttribute('aria-label', `${dish.en} · ${dish.zh}: select to share`);
     node.setAttribute('aria-pressed', 'false');
-    node.innerHTML = `<img src="assets/${dish.id}.png" alt="" draggable="false">`;
+    node.innerHTML = `<img src="${dishAssets.get(dish.id)}" alt="" draggable="false">`;
     $('dishes').append(node); dishNodes.set(dish.id, node);
     node.addEventListener('click', event => {
       if (event.detail !== 0 && performance.now() - lastDragAt < 350) return;
@@ -47,7 +48,7 @@
       if (!drag || drag.pointer !== event.pointerId) return;
       if (!drag.moved && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 8) {
         drag.moved = true; drag.ghost = document.createElement('img');
-        drag.ghost.src = `assets/${dish.id}.png`; drag.ghost.className = 'drag-ghost';
+        drag.ghost.src = dishAssets.get(dish.id); drag.ghost.className = 'drag-ghost';
         drag.ghost.alt = ''; drag.ghost.setAttribute('aria-hidden', 'true');
         document.body.append(drag.ghost); node.classList.add('dragging');
       }
@@ -83,7 +84,7 @@
   function share(id) {
     if (!ready || !game.share(id)) return;
     const img = document.createElement('img');
-    img.src = `assets/${id}.png`; img.className = 'shared-dish'; img.alt = '';
+    img.src = dishAssets.get(id); img.className = 'shared-dish'; img.alt = '';
     $('shared-dishes').append(img);
     render();
     if (game.state.phase === 'ready') { status('A little of everything, for everyone. · 各样点心，一起分享。'); $('continue').focus(); }
@@ -175,7 +176,7 @@
   window.addEventListener('pagehide', () => { clearDrag(); stopCamera(); });
   window.addEventListener('pageshow', () => { if (cameraWanted) openCamera(); });
 
-  const images = [...dishNodes.values()].map(node => node.querySelector('img')).concat($('teapot'));
+  const images = [...dishNodes.values()].map(node => node.querySelector('img')).concat($('teapot'), $('table-surface'));
   function loaded() {
     if (!images.every(img => img.complete && img.naturalWidth)) return;
     ready = true; render();

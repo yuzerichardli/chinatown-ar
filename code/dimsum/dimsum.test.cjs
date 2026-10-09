@@ -44,9 +44,10 @@ function element() {
     fire(n,e={}){if(n==='click'&&this.disabled)return;for(const f of events[n]||[])f({preventDefault(){},detail:0,...e});}
   };
 }
-function harness(mediaDevices) {
-  const ids=['arrival','arrive','camera','experience','board','dishes','shared-table','teapot','shared-dishes','status','continue','camera-controls','enable-camera','camera-status','reading','page','back','next'];
+function harness(mediaDevices, tableReady=true) {
+  const ids=['arrival','arrive','camera','experience','board','dishes','shared-table','table-surface','teapot','shared-dishes','status','continue','camera-controls','enable-camera','camera-status','reading','page','back','next'];
   const el=Object.fromEntries(ids.map(id=>[id,element()]));el.experience.hidden=true;el.reading.hidden=true;
+  el['table-surface'].complete=tableReady;
   const document=element(),window=element();document.hidden=false;document.body=element();
   document.getElementById=id=>el[id];document.createElement=()=>element();let game;
   window.DimSumGame={...require('./game.js'),createGame(){game=createGame();return game;}};
@@ -57,6 +58,30 @@ function harness(mediaDevices) {
 }
 const down={isPrimary:true,button:0,pointerId:1,clientX:200,clientY:200};
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+test('matching transparent 3D-style assets are used before, during, and after sharing',()=>{
+  const html=fs.readFileSync(__dirname+'/index.html','utf8');
+  assert.match(html,/id="table-surface" src="assets\/lazy-susan\.png"/);
+  assert.match(html,/id="teapot" src="assets\/teapot-3d\.png"/);
+  assert.match(html,/dimsum\.css\?v=5/);assert.match(html,/game\.js\?v=4/);assert.match(html,/dimsum\.js\?v=5/);
+  for (const asset of [...dishes.map(d=>d.asset),'teapot-3d.png','lazy-susan.png']) {
+    const png=fs.readFileSync(__dirname+'/assets/'+asset);
+    assert.equal(png.readUInt8(25),6,asset+' must retain RGBA transparency');
+    assert.ok(png.readUInt32BE(16)<=1024,asset+' must be mobile-sized');
+  }
+  const h=harness();h.el.arrive.fire('click');
+  for (const d of dishes) assert.ok(h.dish(d.id).innerHTML.includes('assets/'+d.asset));
+  h.dish('har-gow').fire('pointerdown',down);h.dish('har-gow').fire('pointermove',{...down,clientX:50,clientY:50});
+  assert.equal(h.document.body.children[0].src,'assets/har-gow-3d.png');
+  h.dish('har-gow').fire('pointerup',{...down,clientX:50,clientY:50});
+  assert.equal(h.el['shared-dishes'].children[0].src,'assets/har-gow-3d.png');
+});
+test('table image is included in loading readiness, but Continue remains optional',()=>{
+  const h=harness(undefined,false);h.el.arrive.fire('click');
+  assert.equal(h.dish('har-gow').disabled,true);assert.equal(h.el.continue.hidden,false);
+  h.el['table-surface'].complete=true;h.el['table-surface'].fire('load');
+  assert.equal(h.dish('har-gow').disabled,false);
+  h.el.continue.fire('click');assert.equal(h.game.state.phase,'story');
+});
 test('controller: tap to share, completion, clean story screens, EN/ZH/reflection, Back, Replay',()=>{
   const h=harness();h.el.arrive.fire('click');h.shareAll();
   assert.equal(h.game.state.phase,'ready');assert.equal(h.el.continue.hidden,false);
