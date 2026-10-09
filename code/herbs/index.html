@@ -1,22 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Chinatown AR — Herbal Soup</title>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <!-- 8th Wall WebAR stack (same as the other scenes) -->
-  <script src="./vendor/8frame-1.3.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js"
-          crossorigin="anonymous"></script>
-  <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
-          crossorigin="anonymous" data-preload-chunks="slam"></script>
+  <!-- Standard A-Frame over a plain live-camera video. The vendored 8frame fork
+       waits for the 8th Wall engine before rendering, so it is not used here. -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe-v1.3.0.min.js"></script>
 
-  <script src="./herbs.js?v=9"></script>
+  <script src="./story.js?v=3"></script>
+  <script src="./camera.js?v=3" defer></script>
+  <script src="./herbs.js?v=14"></script>
 
   <style>
-    body { margin: 0; }
+    body { margin: 0; background:#242329; }
+    #live-camera { position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+    a-scene { position:fixed!important; inset:0; z-index:3; background:transparent!important; pointer-events:none; }
+    #camera-help { position:fixed; top:48px; left:50%; transform:translateX(-50%); width:min(calc(100% - 32px),420px); z-index:10; padding:8px 12px; border-radius:12px; color:white; background:#242329dd; font:13px -apple-system,system-ui,sans-serif; text-align:center; }
+    #camera-help p { margin:4px 0; }
+    #camera-help button { background:none; color:#f0dfbe; font-size:13px; padding:8px; min-height:44px; }
     #hint {
       position: fixed; left: 0; right: 0; top: 16px; text-align: center;
       pointer-events: none; font-family: -apple-system, system-ui, sans-serif;
@@ -24,18 +28,30 @@
       z-index: 6;
     }
     /* full-screen layer that captures drags */
-    #dragsurface { position: fixed; inset: 0; z-index: 3; background: transparent; }
+    #dragsurface { position: fixed; inset: 0; z-index: 5; background: transparent; touch-action: none; }
     /* soup pot pinned at the bottom (visual only; taps pass through) */
-    #pot {
+    /* The pot is drawn twice: #pot (whole pot + water) sits behind the 3D herbs,
+       and #pot-front (only the front lip and body) sits in front of them, so a
+       dropped herb looks like it is inside the pot rather than on top of it. */
+    #pot, #pot-front {
       position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
-      z-index: 4; pointer-events: none; text-align: center; line-height: 1;
+      z-index: 2; pointer-events: none; text-align: center; line-height: 1;
     }
-    #pot .bowl {
+    #pot-front { z-index: 4; }
+    #pot-front .bowl { filter: none; }
+    #pot-front .pot-image {
+      -webkit-mask-image: linear-gradient(transparent 16.5%, #000 16.5%), radial-gradient(ellipse 37.5% 8.5% at 50% 16.5%, transparent 98%, #000 100%);
+      -webkit-mask-composite: source-in;
+      mask-image: linear-gradient(transparent 16.5%, #000 16.5%), radial-gradient(ellipse 37.5% 8.5% at 50% 16.5%, transparent 98%, #000 100%);
+      mask-composite: intersect;
+    }
+    #pot-front #count-spacer { visibility: hidden; font: 700 18px -apple-system, system-ui, sans-serif; margin-top: -8px; }
+    #pot .bowl, #pot-front .bowl {
       position: relative; display: block; width: min(48vw, 190px);
       transform-origin: 50% 70%;
       filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5));
     }
-    #pot .pot-image { display: block; width: 100%; height: auto; }
+    #pot .pot-image, #pot-front .pot-image { display: block; width: 100%; height: auto; }
     #pot .pot-water {
       position: absolute; left: 18%; top: 10.5%; width: 64%; height: 10%;
       border-radius: 50%; pointer-events: none;
@@ -51,7 +67,7 @@
     }
     /* soup bubbles that rise from the bowl when an ingredient is added */
     .bubble {
-      position: fixed; z-index: 5; pointer-events: none; border-radius: 50%;
+      position: fixed; z-index: 6; pointer-events: none; border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.95), rgba(210,230,255,0.55));
       box-shadow: 0 0 4px rgba(255,255,255,0.5);
       animation: bubbleUp 1s ease-out forwards;
@@ -71,11 +87,20 @@
       50% { transform: translateY(1px) scaleX(0.97); opacity: 0.96; }
     }
     /* full-screen story slides after the soup (camera stays behind) */
-    #story {
-      position: fixed; inset: 0; background: transparent; display: none;
-      z-index: 6; pointer-events: none;
-    }
-    #story img { width: 100%; height: 100%; object-fit: contain; }
+    [hidden] { display: none !important; }
+    #arrival { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:32px; text-align:center; color:white; font-family:-apple-system,system-ui,sans-serif; }
+    #arrival h1 { font-size:clamp(26px,6vw,38px); line-height:1.15; margin:12px 0; max-width:520px; text-shadow:0 2px 8px #000,0 0 20px #0009; }
+    button { font:16px -apple-system,system-ui,sans-serif; border:0; border-radius:12px; background:#a93429; color:white; padding:15px 24px; min-height:48px; cursor:pointer; }
+    button:focus-visible { outline:3px solid #dfb861; outline-offset:3px; }
+    #arrive { min-width:180px; }
+    #story { position:fixed; inset:0; background:#faf5e9; color:#302f2b; display:flex; flex-direction:column; z-index:8; font-family:-apple-system,system-ui,sans-serif; padding-top:env(safe-area-inset-top); }
+    #story-page { flex:1; overflow:auto; overscroll-behavior:contain; padding:30px max(24px,calc((100vw - 760px)/2)); font-size:18px; line-height:1.7; }
+    #story-page p { margin:0 0 20px; }
+    #story-page:focus { outline:none; }
+    #story-page[lang="zh-Hans"] { line-height:1.95; }
+    #story-page .question { font-size:clamp(23px,5vw,32px); line-height:1.5; margin-top:30px; }
+    #story nav { display:flex; justify-content:space-between; padding:16px max(24px,calc((100vw - 760px)/2)) max(18px,env(safe-area-inset-bottom)); border-top:1px solid #ded3bd; background:#faf5e9; gap:16px; }
+    #story-back { background:#e9dfcd; color:#403b32; }
     /* completion reveal: full bowl of herbal soup */
     #reveal {
       position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none;
@@ -91,11 +116,13 @@
   </style>
 </head>
 <body>
+  <video id="live-camera" autoplay muted playsinline aria-hidden="true"></video>
+  <div id="camera-help" hidden><p id="camera-message" role="status"></p><button id="camera-retry">Try camera again</button></div>
   <a-scene
-    xrextras-loading
-    xrextras-runtime-error
-    renderer="colorManagement: true"
-    xrweb="allowedDevices: any; scale: absolute">
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="colorManagement: true; alpha: true"
+    background="transparent: true">
 
     <a-assets>
       <a-asset-item id="jujubes"     src="../../model/herbs/jujubes.glb"></a-asset-item>
@@ -107,7 +134,7 @@
     <!-- Herbs are children of the camera (head-locked) so they float steadily in
          front of you; herbs.js lays them out and lets you finger-drag each one
          down into the pot. A light rides with the camera so they're always lit. -->
-    <a-camera position="0 0 0">
+    <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false">
       <a-entity class="herb" id="herb0" gltf-model="#jujubes"     scale="0.25 0.25 0.25"></a-entity>
       <a-entity class="herb" id="herb1" gltf-model="#goji"        scale="0.25 0.25 0.25"></a-entity>
       <a-entity class="herb" id="herb2" gltf-model="#ginseng"     scale="0.25 0.25 0.25"></a-entity>
@@ -118,13 +145,18 @@
     <a-light type="ambient" intensity="1.0"></a-light>
   </a-scene>
 
-  <div id="dragsurface"></div>
-  <div id="pot">
+  <section id="arrival" aria-labelledby="arrival-title"><h1 id="arrival-title">Are you at Zhang Wellness Center?</h1><button id="arrive">Yes</button></section>
+  <div id="dragsurface" hidden></div>
+  <div id="pot" hidden>
     <div class="bowl" id="bowl">
       <img class="pot-image" src="assets/herbal-pot.png" alt="Chinese clay soup pot" draggable="false">
       <div class="pot-water"></div>
     </div>
     <div id="count">0/4</div>
+  </div>
+  <div id="pot-front" hidden aria-hidden="true">
+    <div class="bowl" id="bowl-front"><img class="pot-image" src="assets/herbal-pot.png" alt="" draggable="false"></div>
+    <div id="count-spacer">0/4</div>
   </div>
   <div id="reveal">
     <img src="assets/soup_transition.jpg" alt="herbal soup">
@@ -133,7 +165,7 @@
       <div class="cap-action">tap to continue</div>
     </div>
   </div>
-  <div id="story"><img id="storyimg" alt="story"></div>
-  <div id="hint">Drag each ingredient into the soup pot</div>
+  <section id="story" hidden aria-label="Story and reflection"><article id="story-page" tabindex="-1"></article><nav><button id="story-back">Back</button><button id="story-next">Next</button></nav></section>
+  <div id="hint" hidden>Drag each ingredient into the soup pot</div>
 </body>
 </html>

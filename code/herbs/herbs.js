@@ -14,7 +14,7 @@
   const IDS = ['herb0', 'herb1', 'herb2', 'herb3']
 
   let dragging = null, collected = 0, placed = false
-  let state = 'playing'   // playing -> brewing -> soup -> story1 -> story2 -> (restart)
+  let state = 'arrival'   // arrival -> playing -> brewing -> soup -> story -> restart
 
   window.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene')
@@ -22,11 +22,23 @@
     const pot = document.getElementById('pot')
     const reveal = document.getElementById('reveal')
     const story = document.getElementById('story')
-    const storyImg = document.getElementById('storyimg')
+    const storyPage = document.getElementById('story-page')
+    const storyNext = document.getElementById('story-next')
+    let pageIndex = 0
     const hint = document.getElementById('hint')
     const countEl = document.getElementById('count')
     const bowl = document.getElementById('bowl')
+    const potFront = document.getElementById('pot-front')
+    const bowlFront = document.getElementById('bowl-front')
     const ents = IDS.map((id) => document.getElementById(id))
+    ents.forEach(e => e.setAttribute('visible', 'false'))
+    document.getElementById('arrive').addEventListener('click', () => {
+      document.getElementById('arrival').hidden = true
+      surface.hidden = false; pot.hidden = false; potFront.hidden = false; hint.hidden = false
+      ents.forEach(e => e.setAttribute('visible', 'true'))
+      state = 'playing'
+      window.herbCamera?.open()   // retries, and shows the camera notice if it is still unavailable
+    })
 
     // Half-extents of the view at depth D (depends on the live camera fov/aspect)
     function view() {
@@ -94,24 +106,33 @@
         setTimeout(() => b.remove(), 1300)
       }
       if (bounce) {
-        bowl.classList.remove('plop')
-        void bowl.offsetWidth        // restart the animation
-        bowl.classList.add('plop')
+        for (const b of [bowl, bowlFront]) {
+          b.classList.remove('plop')
+          void b.offsetWidth         // restart the animation
+          b.classList.add('plop')
+        }
       }
     }
 
-    // ---- post-game sequence: soup reveal -> 2 story slides -> restart ----
+    // Soup reveal -> English -> Chinese -> reflection -> replay.
     function showStory(n) {
       reveal.style.opacity = '0'
-      pot.style.display = 'none'
+      pot.style.display = 'none'; potFront.style.display = 'none'
       ents.forEach((e) => e.setAttribute('visible', 'false'))
-      storyImg.src = `stories/story${n}.jpg`
-      story.style.display = 'block'
+      pageIndex = n - 1; state = 'story'
+      surface.hidden = true; hint.hidden = true
+      storyPage.innerHTML = window.herbalStoryPages[pageIndex]
+      storyPage.lang = pageIndex === 1 ? 'zh-Hans' : 'en'
+      story.hidden = false; storyPage.scrollTop = 0
+      window.herbCamera?.stop()
+      storyNext.textContent = pageIndex === 2 ? 'Replay' : 'Next'
+      storyPage.focus()
     }
     function restart() {
       reveal.style.opacity = '0'
-      story.style.display = 'none'
-      pot.style.display = ''
+      story.hidden = true; surface.hidden = false; hint.hidden = false
+      window.herbCamera?.open()
+      pot.style.display = ''; potFront.style.display = ''
       collected = 0; countEl.textContent = '0/4'
       ents.forEach((e) => {
         delete e.dataset.done
@@ -123,34 +144,47 @@
       state = 'playing'
     }
     function advancePost() {
-      if (state === 'soup') { showStory(1); state = 'story1' }
-      else if (state === 'story1') { showStory(2); state = 'story2' }
-      else if (state === 'story2') { restart() }
+      if (state === 'soup') showStory(1)
     }
+    storyNext.addEventListener('click', () => pageIndex < 2 ? showStory(pageIndex + 2) : restart())
+    document.getElementById('story-back').addEventListener('click', () => {
+      if (pageIndex > 0) showStory(pageIndex)
+      else { story.hidden = true; surface.hidden = false; reveal.style.opacity = '1'; state = 'soup'; window.herbCamera?.open() }
+    })
 
-    surface.addEventListener('touchstart', (e) => {
-      if (state !== 'playing' || e.touches.length !== 1) return
-      dragging = pickHerb(e.touches[0].clientX, e.touches[0].clientY)
-    }, { passive: false })
+    // Pointer events cover touch and mouse, so the game can be previewed on desktop.
+    let pointerId = null
+    surface.addEventListener('pointerdown', (e) => {
+      if (state !== 'playing' || !placed || pointerId !== null) return
+      pointerId = e.pointerId
+      surface.setPointerCapture(e.pointerId)
+      dragging = pickHerb(e.clientX, e.clientY)
+    })
 
-    surface.addEventListener('touchmove', (e) => {
-      if (state !== 'playing' || !dragging) return
-      const f = fingerLocal(e.touches[0].clientX, e.touches[0].clientY)
+    surface.addEventListener('pointermove', (e) => {
+      if (state !== 'playing' || !dragging || e.pointerId !== pointerId) return
+      const f = fingerLocal(e.clientX, e.clientY)
       dragging.object3D.position.set(f.x, f.y, -D)
-      e.preventDefault()
-    }, { passive: false })
+    })
 
-    surface.addEventListener('touchend', (e) => {
-      if (state !== 'playing') { advancePost(); return }   // soup/story taps
+    surface.addEventListener('pointercancel', (e) => {
+      if (e.pointerId === pointerId) { pointerId = null; dragging = null }
+    })
+
+    surface.addEventListener('pointerup', (e) => {
+      if (state !== 'playing') { advancePost(); return }   // soup reveal tap
+      if (e.pointerId !== pointerId) return
+      pointerId = null
       if (!dragging) return
-      const t = e.changedTouches[0]
+      const t = e
       if (overPot(t.clientX, t.clientY)) {
         dragging.dataset.done = '1'
-        // settle the ingredient into the bowl: shrink it and cluster it just
-        // above the bowl rim so it visibly piles up (stays visible)
+        // settle the ingredient into the soup: shrink it and float it at the
+        // water surface; #pot-front hides its lower part behind the front lip
         const r = bowl.getBoundingClientRect()
-        const ox = [-0.18, -0.06, 0.06, 0.18][collected] * r.width || 0
-        const f = fingerLocal(r.left + r.width / 2 + ox, r.top - 8)
+        const ox = [-0.16, 0.16, -0.05, 0.06][collected] * r.width || 0
+        const oy = [0.18, 0.18, 0.15, 0.2][collected] * r.width * 802 / 1092 || 0
+        const f = fingerLocal(r.left + r.width / 2 + ox, r.top + oy)
         dragging.object3D.position.set(f.x, f.y, -D)
         dragging.setAttribute('scale', '0.11 0.11 0.11')
         splash()                       // bubbles + bowl bounce

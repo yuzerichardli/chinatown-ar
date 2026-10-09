@@ -7,3 +7,6 @@ model/3D/
 
 # Local Python venv for the asset pipeline (recreate with tools/setup_env.sh)
 .venv/
+
+# Local preview screenshots
+.preview/

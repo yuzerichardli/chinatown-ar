@@ -22,7 +22,8 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 |---|---|---|
 | 🥋 Tai-chi masters | `/code/interactive/` | 8th Wall |
 | 🎬 Movie screen (Films at the Gate) | `/code/screen/` | 8th Wall |
-| 🌿 Herbal soup game | `/code/herbs/` | 8th Wall |
+| 🌿 Herbal soup game | `/code/herbs/` | Standard A-Frame + plain camera video |
+| 🦁 Lion dance (Phillips Square) | `/code/lion/` | Plain HTML + camera video |
 | (original simple tour) | `/code/?spot=taichi` | `<model-viewer>` |
 
 ---
@@ -54,10 +55,12 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - 8 photos on the screen → **2 full-screen story slides** (camera shows behind, transparent) → loops.
 - Photos: `code/screen/pictures/pic01.jpg … pic10.jpg` (pic09/pic10 are the story slides).
 
-### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=9`)
-- **Most interactive.** 4 herbs float (head-locked); **finger-drag each into the Chinese clay pot** at the bottom. Each drop → **bubbles + pot bounce** (`splash()`); ingredient piles at the rim. Pot art: `assets/herbal-pot.png` (transparent PNG).
-- After the **4th** drop → ~2.5s **brewing** (continuous bubbles) → fades to a **full-soup reveal** (`assets/soup_transition.jpg`) → **tap → 2 story slides** (`stories/story1.jpg`, `story2.jpg`) → **tap → restart** the game.
-- State machine in `herbs.js`: `playing → brewing → soup → story1 → story2 → (restart)`.
+### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=14`)
+- **No 8th Wall.** Standard A-Frame 1.3.0 (jsDelivr) over a `getUserMedia` camera `<video>` (`camera.js`). Do NOT use the vendored `8frame` here: it waits for the 8th Wall engine (`xrloaded`) before rendering, so the herbs never appear without it.
+- Opens with **"Are you at Zhang Wellness Center?" → Yes** (same pattern as `code/lion/`; no GPS check).
+- 4 herbs float (head-locked); **drag each into the clay pot** (pointer events: touch + mouse). Each drop → bubbles + pot bounce; the ingredient floats in the water. The pot is drawn twice — `#pot` behind the 3D canvas and `#pot-front` (masked to the front lip/body) in front — so dropped herbs look inside the pot.
+- After the **4th** drop → brewing → **soup reveal** (`assets/soup_transition.jpg`) → tap → **text story pages** from `story.js` (English → Chinese → bilingual reflection → Replay). Camera stops during the story and restarts on replay.
+- State machine in `herbs.js`: `arrival → playing → brewing → soup → story → (restart)`.
 - Models: `model/herbs/{jujubes,goji,ginseng,breadsticks}.glb` (decimated to ~100k faces each).
 
 ---
