@@ -6,23 +6,17 @@
   <meta name="theme-color" content="#843a2e">
   <meta name="description" content="Bring four dim sum dishes to a shared table in this simple Chinatown AR mini game.">
   <title>Dim Sum · Share the Table</title>
-  <link rel="stylesheet" href="dimsum.css?v=3">
+  <link rel="stylesheet" href="dimsum.css?v=4">
   <script src="game.js?v=3" defer></script>
-  <script src="dimsum.js?v=3" defer></script>
+  <script src="dimsum.js?v=4" defer></script>
 </head>
 <body>
   <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
   <main>
     <section id="arrival" aria-labelledby="arrival-title">
-      <p class="eyebrow">CHINATOWN · 唐人街</p>
-      <div class="arrival-food" aria-hidden="true">
-        <img src="assets/har-gow.png" alt="" draggable="false">
-        <img src="assets/siu-mai.png" alt="" draggable="false">
-      </div>
-      <h1 id="arrival-title">Are you at a dim sum restaurant?</h1>
-      <p lang="zh-Hans">你在点心餐厅吗？</p>
-      <button id="arrive">Yes · 是的</button>
-      <p class="arrival-note">Take a seat. There’s always room to share.<br><span lang="zh-Hans">坐下来，一起分享。</span></p>
+      <img id="landmark" src="assets/180-cafe-sign.svg?v=1" alt="Drawing of the 180 Café sign with orange lettering and 面包工坊" draggable="false">
+      <h1 id="arrival-title">Are you in front of the 180 cafe?</h1>
+      <button id="arrive">Yes</button>
     </section>
 
     <section id="experience" hidden aria-label="Dim sum sharing">

@@ -10,13 +10,14 @@ The game view has no visible labels, instructions, headings, or counters.
 Continue is available immediately: sharing any or all of the dishes is optional.
 Continue opens English, Chinese, and bilingual reflection pages, then Replay.
 All game objects and the camera are hidden while reading. Back preserves the
-table as it was; Replay clears it. The arrival question and story text remain.
+table as it was; Replay clears it. The opening shows a drawing of the 180 Café
+sign and asks “Are you in front of the 180 cafe?” → Yes, matching the landmark
+openings in the other activities.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera
 permission is requested on Yes, and denial never blocks playing. Nothing is
-recorded, uploaded, or location-detected. A restaurant name can be added when
-the location is chosen; none has been invented.
+recorded, uploaded, or location-detected.
 
 Run tests: `node --test code/dimsum/dimsum.test.cjs` from the repository root.
 Preview: `python3 -m http.server 8765 --bind 127.0.0.1`, then open
@@ -29,10 +30,17 @@ generation tool, with actual transparent backgrounds, then resized to 640px
 PNG assets. No restaurant photos or third-party food artwork were copied.
 The teapot is decorative only. Table geometry is CSS.
 
-The story's general yum cha context is based on the
-[MICHELIN Guide](https://guide.michelin.com/hk/en/best-of/best-dim-sum-yun-cha-hong-kong).
-The remaining text is an original reflection on sharing. It is not a local
-interview or evidence about a specific Chinatown restaurant.
+`assets/180-cafe-sign.svg` is a flat vector landmark drawing based on the
+storefront reference supplied by the project owner: a grey signboard, orange
+180° Café logo, and 面包工坊 lettering. The reference photograph is not copied
+into the public repository.
+
+The English and Chinese story and bilingual reflection question were supplied
+by the project owner, including Judy Wang's family-gathering quotation and her
+attribution as President of the Women’s Auxiliary at the Wong Family Benevolent
+Association. The story preserves that wording, with the quotations displayed
+as blockquotes. Pages follow the other scenes: English → Chinese → bilingual
+reflection, on the same cream reading background with Back, Next, and Replay.
 
 ### Generation prompt set
 

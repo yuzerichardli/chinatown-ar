@@ -7,23 +7,21 @@
   let stream = null, cameraRequest = 0, cameraPending = false, cameraWanted = false;
   const pages = [
     {
-      lang: 'en', title: 'More than a meal', label: '01 / THE STORY',
-      body: `<p>Dim sum brings different dishes to one shared table. It is closely associated with the Cantonese tradition of <em>yum cha</em> — gathering over tea and small dishes. People come with family or friends, choose different things to share, and spend time together.</p>
-        <p>The food gives everyone something to talk about: a favourite dumpling, a dish someone has never tried, or a taste that brings back a memory. Sharing a dish can be a small way to include someone else.</p>
-        <p>In a Chinatown restaurant, a table can be a place to catch up, introduce a friend to familiar food, or spend time with another generation. The meal matters, but so does the company.</p>
-        <p class="note">About yum cha: <a href="https://guide.michelin.com/hk/en/best-of/best-dim-sum-yun-cha-hong-kong" target="_blank" rel="noopener noreferrer">MICHELIN Guide</a>. This is a general cultural story, not a quotation from a local interview.</p>`
+      lang: 'en',
+      body: `<p>You just placed dim sum dishes on the table to share. Eating together is about more than food. It gives people time to catch up, tell stories, and listen to one another. Around a table, elders can share memories, younger people can talk about their lives, and family traditions can pass from one generation to the next. Here, nourishment means both sharing a meal and feeling cared for through time spent together.</p>
+        <p>Reflecting on family gatherings, Judy Wang, President of the Women’s Auxiliary at the Wong Family Benevolent Association, shared:</p>
+        <blockquote>“The family will come together, and sometimes we cook, sometimes we order, and we share stories or activities for the elders. It’s not always just food—it’s the time together.”</blockquote>`
     },
     {
-      lang: 'zh-Hans', title: '不只是一顿饭', label: '02 / 故事',
-      body: `<p>点心让不同的味道来到同一张桌子上，一起分享。点心与粤式「饮茶」的传统紧密相连：亲朋好友围坐在一起，喝茶、吃点心，也聊聊天。大家点几样不同的食物，一起分享，享受相聚的时光。</p>
-        <p>食物也让人有话可聊：一道喜欢的点心，一种还没尝过的味道，或者一口熟悉食物带来的回忆。递过去一笼点心，也是邀请别人一起参与的小小举动。</p>
-        <p>在唐人街的餐厅里，一张桌子可以让朋友聊聊近况，让新朋友尝尝熟悉的味道，也让不同年纪的人有机会坐在一起。重要的不只是吃了什么，还有和谁一起吃。</p>
-        <p class="note">饮茶文化参考：<a href="https://guide.michelin.com/hk/en/best-of/best-dim-sum-yun-cha-hong-kong" target="_blank" rel="noopener noreferrer">米其林指南</a>。这是一般性的文化故事，并非当地访谈引文。</p>`
+      lang: 'zh-Hans',
+      body: `<p>你刚刚把点心摆上桌，准备和大家一起分享。一起吃饭，不只是为了填饱肚子，也是坐下来聊聊近况、听听故事的机会。在唐人街，餐桌上的交流让不同年纪的人有机会了解彼此。长辈说起过去的生活，年轻人分享自己的经历，家里的习惯和记忆也就在聊天中慢慢传了下来。这一站想表达的“滋养”，既是食物带来的满足，也是有人陪伴、有人倾听的温暖。</p>
+        <p>波士顿黄氏宗亲会妇女会会长 Judy Wang 谈到家人相聚时说：</p>
+        <blockquote>“家人会聚在一起，有时自己做饭，有时点餐。我们也会分享故事，或安排一些让长辈参与的活动。大家聚在一起，不只是为了吃饭，更重要的是一起度过的时光。”</blockquote>`
     },
     {
-      lang: 'en', title: 'Who would you invite?', label: '03 / REFLECTION · 想一想',
-      body: `<p class="question">Who would you like to share a dim sum table with? What would you talk about?</p>
-        <p class="question" lang="zh-Hans">你想和谁一起吃点心？你们会聊些什么？</p>`
+      lang: 'en',
+      body: `<p class="question">What stories or memories come up when you share a meal in Chinatown with others?</p>
+        <p class="question" lang="zh-Hans">和别人在中国城一起吃饭时，你会聊起哪些故事或回忆？</p>`
     }
   ];
 
@@ -153,7 +151,7 @@
     $('arrival').hidden = true; $('experience').hidden = true; $('camera-controls').hidden = true; $('camera').hidden = true;
     $('reading').hidden = false;
     const page = pages[index];
-    $('page').innerHTML = `<p class="eyebrow">${page.label}</p><h2>${page.title}</h2>${page.body}`;
+    $('page').innerHTML = page.body;
     $('page').lang = page.lang; $('page').scrollTop = 0;
     $('next').textContent = index === pages.length - 1 ? 'Replay · 再玩一次' : 'Next · 下一页';
     $('page').focus();

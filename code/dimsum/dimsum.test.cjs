@@ -62,13 +62,36 @@ test('controller: tap to share, completion, clean story screens, EN/ZH/reflectio
   assert.equal(h.game.state.phase,'ready');assert.equal(h.el.continue.hidden,false);
   assert.equal(h.el['shared-dishes'].children.length,4);
   h.el.continue.fire('click');assert.equal(h.el.experience.hidden,true);assert.equal(h.el['camera-controls'].hidden,true);assert.equal(h.el.camera.hidden,true);
-  assert.equal(h.el.reading.hidden,false);assert.match(h.el.page.innerHTML,/More than a meal/);
+  assert.equal(h.el.reading.hidden,false);assert.match(h.el.page.innerHTML,/You just placed dim sum dishes on the table to share\./);
   h.el.back.fire('click');assert.equal(h.game.state.phase,'ready');assert.equal(h.el['shared-dishes'].children.length,4);
-  h.el.continue.fire('click');h.el.next.fire('click');assert.equal(h.el.page.lang,'zh-Hans');assert.match(h.el.page.innerHTML,/不只是一顿饭/);
-  h.el.next.fire('click');assert.match(h.el.page.innerHTML,/Who would you invite/);h.el.next.fire('click');
+  h.el.continue.fire('click');h.el.next.fire('click');assert.equal(h.el.page.lang,'zh-Hans');assert.match(h.el.page.innerHTML,/你刚刚把点心摆上桌，准备和大家一起分享。/);
+  h.el.next.fire('click');assert.match(h.el.page.innerHTML,/What stories or memories come up when you share a meal in Chinatown with others\?/);h.el.next.fire('click');
   assert.equal(h.game.state.phase,'sharing');assert.equal(h.el.reading.hidden,true);assert.equal(h.el.experience.hidden,false);
   assert.equal(h.el['shared-dishes'].children.length,0);assert.equal(h.el.continue.hidden,false);assert.equal(h.el['camera-controls'].hidden,true);
   dishes.forEach(d=>assert.equal(h.dish(d.id).hidden,false));
+});
+test('arrival uses the 180 Café landmark and the requested question',()=>{
+  const html=fs.readFileSync(__dirname+'/index.html','utf8');
+  const arrival=html.slice(html.indexOf('<section id="arrival"'),html.indexOf('<section id="experience"'));
+  assert.match(arrival,/src="assets\/180-cafe-sign\.svg\?v=1"/);
+  assert.match(arrival,/>Are you in front of the 180 cafe\?<\/h1>/);
+  assert.match(arrival,/<button id="arrive">Yes<\/button>/);
+  assert.doesNotMatch(arrival,/arrival-food|arrival-note|eyebrow/);
+  const sign=fs.readFileSync(__dirname+'/assets/180-cafe-sign.svg','utf8');
+  for (const character of ['面','包','工','坊']) assert.ok(sign.includes(character));
+});
+test('story preserves the supplied attribution, quotations, and bilingual reflection without added headings',()=>{
+  const h=harness();h.el.arrive.fire('click');h.el.continue.fire('click');
+  assert.match(h.el.page.innerHTML,/Judy Wang, President of the Women’s Auxiliary at the Wong Family Benevolent Association, shared:/);
+  assert.ok(h.el.page.innerHTML.includes('<blockquote>“The family will come together, and sometimes we cook, sometimes we order, and we share stories or activities for the elders. It’s not always just food—it’s the time together.”</blockquote>'));
+  assert.doesNotMatch(h.el.page.innerHTML,/<h2|eyebrow|MICHELIN/);
+  h.el.next.fire('click');
+  assert.match(h.el.page.innerHTML,/波士顿黄氏宗亲会妇女会会长 Judy Wang 谈到家人相聚时说：/);
+  assert.ok(h.el.page.innerHTML.includes('<blockquote>“家人会聚在一起，有时自己做饭，有时点餐。我们也会分享故事，或安排一些让长辈参与的活动。大家聚在一起，不只是为了吃饭，更重要的是一起度过的时光。”</blockquote>'));
+  assert.doesNotMatch(h.el.page.innerHTML,/<h2|eyebrow/);
+  h.el.next.fire('click');
+  assert.ok(h.el.page.innerHTML.includes('What stories or memories come up when you share a meal in Chinatown with others?'));
+  assert.ok(h.el.page.innerHTML.includes('<p class="question" lang="zh-Hans">和别人在中国城一起吃饭时，你会聊起哪些故事或回忆？</p>'));
 });
 test('controller: Continue is available immediately and after any partial interaction',()=>{
   for (const count of [0, 1, 2, 3]) {

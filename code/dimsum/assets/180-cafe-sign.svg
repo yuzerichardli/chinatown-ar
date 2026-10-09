@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">Drawing of the 180 Café sign</title>
+  <desc id="desc">An orange 180 degree Café logo and the Chinese words 面包工坊 on a wide grey signboard.</desc>
+  <!-- Flat landmark illustration from the supplied storefront photo.
+       Match the other activities' SVG drawings; omit the building and posters. -->
+  <rect x="24" y="47" width="924" height="222" rx="3" fill="#3e474f" opacity=".25"/>
+  <rect x="14" y="35" width="928" height="222" rx="3" fill="#7c8993" stroke="#57636c" stroke-width="3"/>
+  <path d="M17 38H939V48H17Z" fill="#98a4ad"/>
+  <path d="M17 246H939V254H17Z" fill="#65717c"/>
+  <!-- The oversized C wraps around the smaller 180° and afé lettering. -->
+  <path d="M166 80C137 57 95 75 74 112C58 140 61 184 86 207C107 229 133 231 157 222"
+        fill="none" stroke="#424b53" stroke-width="24" stroke-linecap="round" transform="translate(4 5)"/>
+  <path d="M166 80C137 57 95 75 74 112C58 140 61 184 86 207C107 229 133 231 157 222"
+        fill="none" stroke="#efcd91" stroke-width="25" stroke-linecap="round"/>
+  <path d="M166 80C137 57 95 75 74 112C58 140 61 184 86 207C107 229 133 231 157 222"
+        fill="none" stroke="#dd921e" stroke-width="20" stroke-linecap="round"/>
+  <g font-family="'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif" font-weight="800">
+    <g fill="#424b53" transform="translate(4 5)">
+      <text x="130" y="133" font-size="57">180°</text>
+      <text x="119" y="215" font-size="79">afé</text>
+    </g>
+    <g fill="#e59c2b" stroke="#efcd91" stroke-width="2" paint-order="stroke fill">
+      <text x="130" y="133" font-size="57">180°</text>
+      <text x="119" y="215" font-size="79">afé</text>
+    </g>
+  </g>
+  <g font-family="'Kaiti SC','STKaiti','KaiTi','PingFang SC','Noto Sans CJK SC','Microsoft YaHei',sans-serif"
+     font-size="99" font-weight="800" text-anchor="middle">
+    <g fill="#424b53" transform="translate(4 5)">
+      <text x="387" y="191">面</text><text x="539" y="191">包</text>
+      <text x="691" y="191">工</text><text x="843" y="191">坊</text>
+    </g>
+    <g fill="#ef9d25" stroke="#f0d09a" stroke-width="2.5" paint-order="stroke fill">
+      <text x="387" y="191">面</text><text x="539" y="191">包</text>
+      <text x="691" y="191">工</text><text x="843" y="191">坊</text>
+    </g>
+  </g>
+</svg>

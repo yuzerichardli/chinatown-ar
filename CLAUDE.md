@@ -71,12 +71,13 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 
 ---
 
-### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=3`)
+### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=4`)
 - Same simple interaction pattern as herbs: **drag four dishes onto one shared table** (or tap a dish, then the table).
 - No matching requests, tray rotation, tea-pouring stage, timer, or score. The teapot is decorative.
-- Opens with **"Are you at a dim sum restaurant?" → Yes**; no restaurant has been chosen or location detected.
+- Opens with a flat drawing of the 180 Café sign (`assets/180-cafe-sign.svg`) and **"Are you in front of the 180 cafe?" → Yes**. No location detection.
 - Word-free game view (food/table plus Continue). Sharing dishes is optional; Continue works immediately → English, Chinese, bilingual reflection → Replay.
 - All game elements and the camera are hidden during the story. Back preserves a partial table; Replay clears it.
+- Uses the project owner's English/Chinese story and Judy Wang family-gathering quotation, then the bilingual meal-memory reflection. Plain cream story pages match the other scenes.
 - Photographic transparent food assets are in `code/dimsum/assets/`; generation prompts and story context are documented in its `README.md`.
 - QR: `qr/dimsum.png` → `/code/dimsum/`. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 
@@ -139,7 +140,6 @@ See `tools/README.md` for exact commands.
 **Done:** the original scenes plus lion dance and the simple dim sum sharing scene. Materials fixed, models optimized. Each scene has a QR in `qr/`.
 
 **Not done / ideas:**
-- Choose the dim sum restaurant and replace its generic arrival question with the agreed location.
 - Add a drop **sound**; per-herb **size tuning**.
 - Optional: revisit world-anchored AR (image-target markers) if rock-solid spatial anchoring is ever needed — current scenes are deliberately camera-relative.
 
