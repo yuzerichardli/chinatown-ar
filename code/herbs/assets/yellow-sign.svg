@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 440" role="img" aria-labelledby="t">
+  <title id="t">Drawing of the yellow Zhang Wellness Center sign</title>
+  <!-- Flat illustration from a reference photo of the sign on Beach Street:
+       a tall yellow board with a red vertical title 张氏中医跌打推拿中心,
+       a small red seal, and green side columns. Hours and phone are left out. -->
+  <rect x="8" y="8" width="184" height="424" rx="5" fill="#f6c21a" stroke="#d99a0e" stroke-width="6"/>
+  <!-- small red seal -->
+  <rect x="86" y="20" width="28" height="24" rx="3" fill="none" stroke="#c8281f" stroke-width="3"/>
+  <path d="M93 27h14M93 32h14M93 37h14" stroke="#c8281f" stroke-width="2.5"/>
+  <g font-family="'PingFang SC','Hiragino Sans GB','Noto Sans CJK SC','Microsoft YaHei',sans-serif" text-anchor="middle">
+    <!-- red vertical title -->
+    <g fill="#d12a1f" font-size="34" font-weight="800">
+      <text x="100" y="84">张</text><text x="100" y="120">氏</text><text x="100" y="156">中</text>
+      <text x="100" y="192">医</text><text x="100" y="228">跌</text><text x="100" y="264">打</text>
+      <text x="100" y="300">推</text><text x="100" y="336">拿</text><text x="100" y="372">中</text>
+      <text x="100" y="408">心</text>
+    </g>
+    <!-- green side columns -->
+    <g fill="#3f8a3a" font-size="22" font-weight="600">
+      <text x="38" y="80">跌</text><text x="38" y="106">打</text><text x="38" y="132">损</text><text x="38" y="158">伤</text>
+      <text x="38" y="196">推</text><text x="38" y="222">拿</text><text x="38" y="248">按</text><text x="38" y="274">摩</text>
+      <text x="38" y="312">秘</text><text x="38" y="338">方</text><text x="38" y="364">足</text><text x="38" y="390">疗</text>
+      <text x="162" y="80">拔</text><text x="162" y="106">罐</text><text x="162" y="132">刮</text><text x="162" y="158">痧</text>
+      <text x="162" y="196">姜</text><text x="162" y="222">疗</text><text x="162" y="248">蜡</text><text x="162" y="274">疗</text>
+      <text x="162" y="312">中</text><text x="162" y="338">医</text><text x="162" y="364">中</text><text x="162" y="390">药</text>
+    </g>
+  </g>
+  <g fill="#3f8a3a"><circle cx="38" cy="172" r="3"/><circle cx="38" cy="288" r="3"/><circle cx="162" cy="172" r="3"/><circle cx="162" cy="288" r="3"/></g>
+</svg>

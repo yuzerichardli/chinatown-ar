@@ -63,7 +63,7 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 
 ### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=14`)
 - **No 8th Wall.** Standard A-Frame 1.3.0 (jsDelivr) over a `getUserMedia` camera `<video>` (`camera.js`). Do NOT use the vendored `8frame` here: it waits for the 8th Wall engine (`xrloaded`) before rendering, so the herbs never appear without it.
-- Opens with **"Are you at Zhang Wellness Center?" → Yes** (same pattern as `code/lion/`; no GPS check).
+- Opens with a drawing of the yellow sign (`assets/yellow-sign.svg`) and **"Do you see the yellow sign at Zhang Wellness Center?" → Yes** (same pattern as `code/lion/`; no GPS check).
 - 4 herbs float (head-locked); **drag each into the clay pot** (pointer events: touch + mouse). Each drop → bubbles + pot bounce; the ingredient floats in the water. The pot is drawn twice — `#pot` behind the 3D canvas and `#pot-front` (masked to the front lip/body) in front — so dropped herbs look inside the pot.
 - After the **4th** drop → brewing → **soup reveal** (`assets/soup_transition.jpg`) → tap → **text story pages** from `story.js` (English → Chinese → bilingual reflection → Replay). Camera stops during the story and restarts on replay.
 - State machine in `herbs.js`: `arrival → playing → brewing → soup → story → (restart)`.

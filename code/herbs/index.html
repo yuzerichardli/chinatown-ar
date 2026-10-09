@@ -93,6 +93,7 @@
     button { font:16px -apple-system,system-ui,sans-serif; border:0; border-radius:12px; background:#a93429; color:white; padding:15px 24px; min-height:48px; cursor:pointer; }
     button:focus-visible { outline:3px solid #dfb861; outline-offset:3px; }
     #arrive { min-width:180px; }
+    #landmark { height:min(40svh,360px); width:auto; filter:drop-shadow(0 4px 14px #0009); }
     #story { position:fixed; inset:0; background:#faf5e9; color:#302f2b; display:flex; flex-direction:column; z-index:8; font-family:-apple-system,system-ui,sans-serif; padding-top:env(safe-area-inset-top); }
     #story-page { flex:1; overflow:auto; overscroll-behavior:contain; padding:30px max(24px,calc((100vw - 760px)/2)); font-size:18px; line-height:1.7; }
     #story-page p { margin:0 0 20px; }
@@ -146,7 +147,7 @@
     <a-light type="ambient" intensity="1.0"></a-light>
   </a-scene>
 
-  <section id="arrival" aria-labelledby="arrival-title"><h1 id="arrival-title">Are you at Zhang Wellness Center?</h1><button id="arrive">Yes</button></section>
+  <section id="arrival" aria-labelledby="arrival-title"><img id="landmark" src="assets/yellow-sign.svg?v=2" alt="Drawing of the yellow Zhang Wellness Center sign" draggable="false"><h1 id="arrival-title">Do you see the yellow sign at Zhang Wellness Center?</h1><button id="arrive">Yes</button></section>
   <div id="dragsurface" hidden></div>
   <div id="pot" hidden>
     <div class="bowl" id="bowl">
