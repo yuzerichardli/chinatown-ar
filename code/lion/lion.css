@@ -1,6 +1,6 @@
 :root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;background:#242329;font-synthesis:none}
 *{box-sizing:border-box}body{margin:0} [hidden]{display:none!important}
-#arrival{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px;text-align:center;background:transparent;color:white}#arrival h1{max-width:520px;text-shadow:0 2px 8px #000,0 0 20px #0009}#arrive{min-width:180px}
+#arrival{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px;text-align:center;background:transparent;color:white}#arrival h1{max-width:520px;text-shadow:0 2px 8px #000,0 0 20px #0009}#arrive{min-width:180px}#landmark{width:min(64vw,34svh,300px);height:auto;filter:drop-shadow(0 4px 14px #0007)}
 #experience{position:relative;isolation:isolate}#fireworks{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:-1}#fireworks svg{width:100%;height:100%;display:block}
 #camera{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}main{position:relative}
 #experience{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(transparent 75%,#17171d77)}

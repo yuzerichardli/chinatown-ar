@@ -4,7 +4,9 @@ New independent static page: `code/lion/`. Existing activities are unchanged.
 
 ## Flow
 
-The opening screen asks “Are you at Phillips Square?” with a Yes button.
+The opening screen shows a drawing of the green tables and seats
+(`assets/green-tables.svg`) and asks “Do you see the green tables and seats at
+Phillips Square?” with a Yes button.
 The question has a transparent background over the camera, requested on opening.
 Yes opens the lion scene; it does not check GPS. The hold button is English only.
 Small gold and coral fireworks animate with the held interaction, freeze when
