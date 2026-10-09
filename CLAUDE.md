@@ -79,7 +79,7 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - All game elements and the camera are hidden during the story. Back preserves a partial table; Replay clears it.
 - Uses the project owner's English/Chinese story and Judy Wang family-gathering quotation, then the bilingual meal-memory reflection. Plain cream story pages match the other scenes.
 - Transparent softly shaded 3D-style food/teapot sprites (`*-3d.png`) and a wood/glass lazy Susan (`lazy-susan.png`) match the textured objects in the other activities. The table image keeps its native perspective; items use small contact shadows. Original sprites remain unused for rollback. Generation/edit prompts and story context are in its `README.md`.
-- QR: `qr/dimsum.png` → `/code/dimsum/`. Tests: `node --test code/dimsum/dimsum.test.cjs`.
+- QR: `qr/restaurant.png` → `/code/dimsum/`. This is a separate new file; `qr/dimsum.png` and the other QR codes are unchanged. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 
 ## 4. Where the assets live  (IMPORTANT for continuity)
 
