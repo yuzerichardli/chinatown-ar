@@ -30,7 +30,7 @@
   for (const dish of dishes) {
     const node = document.createElement('button');
     node.className = 'dish'; node.dataset.dish = dish.id; node.disabled = true;
-    node.setAttribute('aria-label', `${dish.en} · ${dish.zh}: select to share`);
+    node.setAttribute('aria-label', `${dish.en}: select to share`);
     node.setAttribute('aria-pressed', 'false');
     node.innerHTML = `<img src="${dishAssets.get(dish.id)}" alt="" draggable="false">`;
     $('dishes').append(node); dishNodes.set(dish.id, node);
@@ -114,7 +114,7 @@
     cameraRequest++; cameraPending = false;
     if (stream) stream.getTracks().forEach(track => track.stop());
     stream = null; $('camera').srcObject = null;
-    $('enable-camera').disabled = false; $('enable-camera').textContent = 'Enable camera · 开启相机';
+    $('enable-camera').disabled = false; $('enable-camera').textContent = 'Enable camera';
     $('camera-status').textContent = 'Preview without camera · 无相机预览';
   }
   async function openCamera() {
@@ -127,12 +127,12 @@
       if (request !== cameraRequest || document.hidden || game.state.phase === 'story') { incoming.getTracks().forEach(track => track.stop()); return; }
       stream = incoming; $('camera').srcObject = stream; await $('camera').play();
       if (request !== cameraRequest) return;
-      $('enable-camera').textContent = 'Camera off · 关闭相机';
+      $('enable-camera').textContent = 'Camera off';
       $('camera-status').textContent = 'Nothing is recorded or uploaded. · 画面不会录制或上传。';
     } catch {
       if (request !== cameraRequest) return;
       stopCamera(); cameraWanted = false;
-      $('enable-camera').textContent = 'Try camera again · 重试相机';
+      $('enable-camera').textContent = 'Try camera again';
       $('camera-status').textContent = 'You can still play. For AR, use Safari or Chrome and allow the camera. · 可继续游戏；AR 请在浏览器中允许相机。';
     } finally {
       if (request === cameraRequest) { cameraPending = false; $('enable-camera').disabled = false; }
@@ -154,7 +154,7 @@
     const page = pages[index];
     $('page').innerHTML = page.body;
     $('page').lang = page.lang; $('page').scrollTop = 0;
-    $('next').textContent = index === pages.length - 1 ? 'Replay · 再玩一次' : 'Next · 下一页';
+    $('next').textContent = index === pages.length - 1 ? 'Replay' : 'Next';
     $('page').focus();
   }
   function returnToTable(replay) {

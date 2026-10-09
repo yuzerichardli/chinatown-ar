@@ -71,11 +71,12 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 
 ---
 
-### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=5`, `game.js?v=4`)
+### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=6`, `game.js?v=4`)
 - Same simple interaction pattern as herbs: **drag four dishes onto one shared table** (or tap a dish, then the table).
 - No matching requests, required tray rotation, tea-pouring stage, timer, or score. The teapot and lazy Susan are visual only.
 - Opens with a flat drawing of the 180 Café sign (`assets/180-cafe-sign.svg`) and **"Are you in front of the 180 cafe?" → Yes**. No location detection.
 - Word-free game view (food/table plus Continue). Sharing dishes is optional; Continue works immediately → English, Chinese, bilingual reflection → Replay.
+- Button labels are English-only, including camera controls, Back, Next, and Replay; Chinese story/reflection text is unchanged.
 - All game elements and the camera are hidden during the story. Back preserves a partial table; Replay clears it.
 - Uses the project owner's English/Chinese story and Judy Wang family-gathering quotation, then the bilingual meal-memory reflection. Plain cream story pages match the other scenes.
 - Transparent softly shaded 3D-style food/teapot sprites (`*-3d.png`) and a wood/glass lazy Susan (`lazy-susan.png`) match the textured objects in the other activities. The table image keeps its native perspective; items use small contact shadows. Original sprites remain unused for rollback. Generation/edit prompts and story context are in its `README.md`.

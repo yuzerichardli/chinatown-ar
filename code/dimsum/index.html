@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#843a2e">
   <meta name="description" content="Bring four dim sum dishes to a shared table in this simple Chinatown AR mini game.">
   <title>Dim Sum · Share the Table</title>
-  <link rel="stylesheet" href="dimsum.css?v=5">
+  <link rel="stylesheet" href="dimsum.css?v=6">
   <script src="game.js?v=4" defer></script>
-  <script src="dimsum.js?v=5" defer></script>
+  <script src="dimsum.js?v=6" defer></script>
 </head>
 <body>
   <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
@@ -31,20 +31,20 @@
 
       <div class="controls">
         <p id="status" class="sr-only" role="status"></p>
-        <button id="continue">Tap to continue<br><span lang="zh-Hans">轻触继续</span></button>
+        <button id="continue">Tap to continue</button>
       </div>
     </section>
 
     <aside id="camera-controls" class="camera-controls">
-      <button id="enable-camera" class="text-button">Enable camera · 开启相机</button>
+      <button id="enable-camera" class="text-button">Enable camera</button>
       <p id="camera-status">You can also play without a camera.</p>
     </aside>
 
     <section id="reading" hidden aria-label="Dim sum story">
       <article id="page" tabindex="-1"></article>
       <nav aria-label="Story navigation">
-        <button id="back" class="secondary">Back · 上一页</button>
-        <button id="next">Next · 下一页</button>
+        <button id="back" class="secondary">Back</button>
+        <button id="next">Next</button>
       </nav>
     </section>
     <noscript>This mini game needs JavaScript. · 请开启 JavaScript 以体验互动游戏。</noscript>

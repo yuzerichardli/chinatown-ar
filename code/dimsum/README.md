@@ -15,6 +15,8 @@ All game objects and the camera are hidden while reading. Back preserves the
 table as it was; Replay clears it. The opening shows a drawing of the 180 Café
 sign and asks “Are you in front of the 180 cafe?” → Yes, matching the landmark
 openings in the other activities.
+All button labels are English-only; the Chinese story and bilingual reflection
+remain unchanged.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera

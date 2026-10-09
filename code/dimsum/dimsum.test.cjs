@@ -37,7 +37,7 @@ function element() {
     rect:{left:0,top:0,right:100,bottom:100,width:100,height:100}, textContent:'', innerHTML:'',
     classList:{add(...names){names.forEach(n=>classes.add(n));},remove(...names){names.forEach(n=>classes.delete(n));},
       toggle(name,force){if(force ?? !classes.has(name)) classes.add(name); else classes.delete(name);},contains(n){return classes.has(n);}},
-    setAttribute(){}, querySelector(s){if(!selectors.has(s)) selectors.set(s,element());return selectors.get(s);},
+    attributes:{},setAttribute(name,value){this.attributes[name]=value;}, querySelector(s){if(!selectors.has(s)) selectors.set(s,element());return selectors.get(s);},
     append(child){this.children.push(child);},replaceChildren(){this.children=[];},remove(){this.removed=true;},focus(){this.focused=true;},
     getBoundingClientRect(){return this.rect;},setPointerCapture(id){captured.add(id);},hasPointerCapture(id){return captured.has(id);},releasePointerCapture(id){captured.delete(id);},
     play:async()=>{},addEventListener(n,f){(events[n] ||= []).push(f);},
@@ -62,7 +62,7 @@ test('matching transparent 3D-style assets are used before, during, and after sh
   const html=fs.readFileSync(__dirname+'/index.html','utf8');
   assert.match(html,/id="table-surface" src="assets\/lazy-susan\.png"/);
   assert.match(html,/id="teapot" src="assets\/teapot-3d\.png"/);
-  assert.match(html,/dimsum\.css\?v=5/);assert.match(html,/game\.js\?v=4/);assert.match(html,/dimsum\.js\?v=5/);
+  assert.match(html,/dimsum\.css\?v=6/);assert.match(html,/game\.js\?v=4/);assert.match(html,/dimsum\.js\?v=6/);
   for (const asset of [...dishes.map(d=>d.asset),'teapot-3d.png','lazy-susan.png']) {
     const png=fs.readFileSync(__dirname+'/assets/'+asset);
     assert.equal(png.readUInt8(25),6,asset+' must retain RGBA transparency');
@@ -74,6 +74,22 @@ test('matching transparent 3D-style assets are used before, during, and after sh
   assert.equal(h.document.body.children[0].src,'assets/har-gow-3d.png');
   h.dish('har-gow').fire('pointerup',{...down,clientX:50,clientY:50});
   assert.equal(h.el['shared-dishes'].children[0].src,'assets/har-gow-3d.png');
+});
+test('buttons and their accessible names are English-only; Chinese story text remains',async()=>{
+  const html=fs.readFileSync(__dirname+'/index.html','utf8');
+  for (const button of html.matchAll(/<button\b[^>]*>[\s\S]*?<\/button>/g)) assert.doesNotMatch(button[0],/[\u3400-\u9fff]/);
+  assert.match(html,/<button id="continue">Tap to continue<\/button>/);
+  assert.match(html,/<button id="back" class="secondary">Back<\/button>/);
+  const h=harness();h.el.arrive.fire('click');
+  for (const d of dishes) assert.equal(h.dish(d.id).attributes['aria-label'],d.en+': select to share');
+  await flush();assert.equal(h.el['enable-camera'].textContent,'Try camera again');
+  h.el.continue.fire('click');assert.equal(h.el['enable-camera'].textContent,'Enable camera');
+  assert.equal(h.el.next.textContent,'Next');
+  h.el.next.fire('click');assert.equal(h.el.next.textContent,'Next');assert.match(h.el.page.innerHTML,/你刚刚把点心摆上桌/);
+  h.el.next.fire('click');assert.equal(h.el.next.textContent,'Replay');assert.match(h.el.page.innerHTML,/和别人在中国城一起吃饭时/);
+  const k=harness({getUserMedia:async()=>({getTracks:()=>[{stop(){}}]})});
+  k.el.arrive.fire('click');await flush();assert.equal(k.el['enable-camera'].textContent,'Camera off');
+  k.el['enable-camera'].fire('click');assert.equal(k.el['enable-camera'].textContent,'Enable camera');
 });
 test('table image is included in loading readiness, but Continue remains optional',()=>{
   const h=harness(undefined,false);h.el.arrive.fire('click');
