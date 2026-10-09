@@ -8,14 +8,14 @@ Two short interactions, following the herbal-soup game: share dim sum on one
 table, then serve tea to three cups. No matching requests, rotation, timer,
 or score. A tap-a-dish → tap-the-table alternative also supports keyboard input.
 The dish-sharing view has no visible labels, instructions, headings, or counters.
-Its Continue button is available immediately: sharing any or all dishes is optional.
-Continue places any remaining dishes on the table and adds three matching cups
+Its Next button is available immediately: sharing any or all dishes is optional.
+Next places any remaining dishes on the table and adds three matching cups
 around its edge, without removing the existing table or placed dishes. One line
 says “Drag the teapot to fill each cup.” Drop the pot over each cup opening to
 trigger a tilt, tea stream, filling tea surface, and ripple animation. Tap the
 teapot → tap an empty cup is also supported. Each cup fills once; pours cannot
-overlap. After the third pour finishes, “Enjoy your meal!” and Continue appear.
-That Continue opens English, Chinese, and bilingual reflection pages, then Replay.
+overlap. After the third pour finishes, “Enjoy your meal!” and Next appear.
+That Next opens English, Chinese, and bilingual reflection pages, then Replay.
 All game objects and the camera are hidden while reading. Back preserves the
 served table and filled cups; Replay clears dishes and tea. Leaving the page,
 switching away, or resizing during a pour cancels it safely without counting
@@ -25,6 +25,9 @@ sign and asks “Are you in front of the 180 cafe?” → Yes, matching the land
 openings in the other activities.
 All button labels are English-only; the Chinese story and bilingual reflection
 remain unchanged.
+The table fills nearly the full phone width and expands on wider screens. Cups
+are 15% of the table image width, with at least 44px controls and forgiving
+drop targets around their openings. The table retains its original perspective.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera

@@ -72,15 +72,16 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 
 ---
 
-### 🥟 `code/dimsum/` — Dim sum sharing and tea (`dimsum.js?v=7`, `game.js?v=5`)
+### 🥟 `code/dimsum/` — Dim sum sharing and tea (`dimsum.js?v=8`, `game.js?v=5`)
 - Same simple interaction pattern as herbs: **drag four dishes onto one shared table** (or tap a dish, then the table).
 - Then drag the existing teapot to **three tea cups**, one at a time (or tap the pot, then a cup). Each drop animates the pot tilting, a tea stream, and the tea filling the cup. All three must finish before proceeding. No matching requests, required tray rotation, timer, or score; the lazy Susan remains visual only.
 - Opens with a flat drawing of the 180 Café sign (`assets/180-cafe-sign.svg`) and **"Are you in front of the 180 cafe?" → Yes**. No location detection.
-- Word-free dish-sharing view (food/table plus Continue). Sharing dishes is optional; Continue works immediately, placing any remaining dishes on the table for tea. The same table and all four dishes stay visible; three matching cups appear with **"Drag the teapot to fill each cup."** Once all cups are filled → **"Enjoy your meal!" + Continue** → English, Chinese, bilingual reflection → Replay.
+- Word-free dish-sharing view (food/table plus Next). Sharing dishes is optional; Next works immediately, placing any remaining dishes on the table for tea. The same table and all four dishes stay visible; three matching cups appear with **"Drag the teapot to fill each cup."** Once all cups are filled → **"Enjoy your meal!" + Next** → English, Chinese, bilingual reflection → Replay.
 - Button labels are English-only, including camera controls, Back, Next, and Replay; Chinese story/reflection text is unchanged.
 - All game elements and the camera are hidden during the story. Back preserves the served table/filled cups; Replay clears dishes and tea. Leaving/resizing during a pour cancels it without filling that cup; reduced-motion mode skips movement.
 - Uses the project owner's English/Chinese story and Judy Wang family-gathering quotation, then the bilingual meal-memory reflection. Plain cream story pages match the other scenes.
 - Transparent softly shaded 3D-style food/teapot/cup sprites (`*-3d.png`) and a wood/glass lazy Susan (`lazy-susan.png`) match the textured objects in the other activities. The cup matches the original ivory/cobalt-blue teapot and uses an animated tea surface; the same pot image is used during drag and pour. The table image keeps its native perspective; items use small contact shadows. Original sprites remain unused for rollback. Generation/edit prompts and story context are in its `README.md`.
+- Table now grows to nearly full phone width and a much larger wide-screen size; cups are 15% of the table image width with at least 44px controls and expanded drag/drop targets.
 - QR: `qr/dimsum.png` → `/code/dimsum/`. All other scene QR codes are unchanged. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 
 ## 4. Where the assets live  (IMPORTANT for continuity)

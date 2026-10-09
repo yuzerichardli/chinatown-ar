@@ -99,8 +99,8 @@
     return cups.find(id => {
       if (game.state.filled.includes(id)) return false;
       const rect = cupNodes.get(id).getBoundingClientRect();
-      return x >= rect.left + rect.width * .12 && x <= rect.right - rect.width * .12 &&
-        y >= rect.top && y <= rect.top + rect.height * .65;
+      return x >= rect.left - 6 && x <= rect.right + 6 &&
+        y >= rect.top - 8 && y <= rect.top + rect.height * .72;
     });
   }
   const pot = $('teapot-control');

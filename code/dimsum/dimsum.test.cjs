@@ -107,7 +107,7 @@ test('matching transparent 3D-style assets are used before, during, and after sh
   const html=fs.readFileSync(__dirname+'/index.html','utf8');
   assert.match(html,/id="table-surface" src="assets\/lazy-susan\.png"/);
   assert.match(html,/id="teapot" src="assets\/teapot-3d\.png"/);
-  assert.match(html,/dimsum\.css\?v=7/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=7/);
+  assert.match(html,/dimsum\.css\?v=8/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=8/);
   for (const asset of [...dishes.map(d=>d.asset),'teapot-3d.png','tea-cup-3d.png','lazy-susan.png']) {
     const png=fs.readFileSync(__dirname+'/assets/'+asset);
     assert.equal(png.readUInt8(25),6,asset+' must retain RGBA transparency');
@@ -123,7 +123,7 @@ test('matching transparent 3D-style assets are used before, during, and after sh
 test('buttons and their accessible names are English-only; Chinese story text remains',async()=>{
   const html=fs.readFileSync(__dirname+'/index.html','utf8');
   for (const button of html.matchAll(/<button\b[^>]*>[\s\S]*?<\/button>/g)) assert.doesNotMatch(button[0],/[\u3400-\u9fff]/);
-  assert.match(html,/<button id="continue">Tap to continue<\/button>/);
+  assert.match(html,/<button id="continue">Next<\/button>/);
   assert.match(html,/<button id="back" class="secondary">Back<\/button>/);
   const h=harness();h.el.arrive.fire('click');
   for (const d of dishes) assert.equal(h.dish(d.id).attributes['aria-label'],d.en+': select to share');
@@ -135,6 +135,15 @@ test('buttons and their accessible names are English-only; Chinese story text re
   const k=harness({getUserMedia:async()=>({getTracks:()=>[{stop(){}}]})});
   k.el.arrive.fire('click');await flush();assert.equal(k.el['enable-camera'].textContent,'Camera off');
   k.el['enable-camera'].fire('click');assert.equal(k.el['enable-camera'].textContent,'Enable camera');
+});
+test('larger responsive table and smaller cups retain the table perspective and touch controls',()=>{
+  const css=fs.readFileSync(__dirname+'/dimsum.css','utf8');
+  assert.match(css,/#board\.tea-stage\{[^}]*width:min\(100vw,100svh,840px\)/);
+  assert.match(css,/#board\.tea-stage #table-setting\{[^}]*width:108%/);
+  assert.match(css,/\.tea-cup\{[^}]*width:15%;min-height:44px/);
+  assert.match(css,/#table-setting\{[^}]*aspect-ratio:3\/2/);
+  assert.match(css,/#experience\{[^}]*overflow-x:clip/);
+  assert.doesNotMatch(fs.readFileSync(__dirname+'/index.html','utf8'),/Tap to continue/);
 });
 test('table image is included in loading readiness, but Continue remains optional',()=>{
   const h=harness(undefined,false);h.el.arrive.fire('click');
@@ -250,6 +259,14 @@ test('controller: teapot drag/drop, outside/full-cup drops, cancellation and los
   h.finishPour();assert.deepEqual(h.game.state.filled,['left']);
   pot.fire('pointerdown',down);pot.fire('pointermove',onCup);pot.fire('pointerup',onCup);
   assert.equal(h.game.state.phase,'tea');assert.equal(h.timers.size,0);assert.deepEqual(h.game.state.filled,['left']);
+});
+test('controller: smaller cup keeps a forgiving drop area around its opening',()=>{
+  const h=harness();h.el.arrive.fire('click');h.el.continue.fire('click');
+  h.cup('left').rect={left:20,top:20,right:72,bottom:72,width:52,height:52};
+  const pot=h.el['teapot-control'], nearRim={...down,clientX:16,clientY:17};
+  pot.fire('pointerdown',down);pot.fire('pointermove',nearRim);pot.fire('pointerup',nearRim);
+  assert.equal(h.game.state.phase,'pouring');assert.equal(h.game.state.pouring,'left');
+  h.finishPour();assert.deepEqual(h.game.state.filled,['left']);
 });
 test('controller: leaving or resizing during a pour clears animation/timer without filling a cup',()=>{
   for(const action of ['blur','resize','pagehide','visibilitychange']) {
