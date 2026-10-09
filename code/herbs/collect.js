@@ -64,9 +64,21 @@
     }),
   }
   const MODEL_PICS = { ginseng: 1, goji: 1, dates: 1, yam: 1 }
+  // Drawn piles are trimmed to their own outline (see fitDrawn) so every
+  // ingredient, picture or drawing, is centred and scaled the same way.
+  const FIT = {}
   const pileSvg = (id) => MODEL_PICS[id]
-    ? `<img src="assets/ingredients/${id}.png?v=1" alt="" draggable="false">`
-    : `<svg viewBox="0 0 120 80" aria-hidden="true">${ART[id]()}</svg>`
+    ? `<img src="assets/ingredients/${id}.png?v=2" alt="" draggable="false">`
+    : `<svg viewBox="${FIT[id] || '0 0 120 80'}" aria-hidden="true"><g>${ART[id]()}</g></svg>`
+  function fitDrawn() {
+    cabinet.querySelectorAll('.drawer').forEach((d) => {
+      const svg = d.querySelector('svg')
+      if (!svg) return
+      const b = svg.firstElementChild.getBBox(), m = 3
+      FIT[d.dataset.id] = `${(b.x - m).toFixed(1)} ${(b.y - m).toFixed(1)} ${(b.width + 2 * m).toFixed(1)} ${(b.height + 2 * m).toFixed(1)}`
+      svg.setAttribute('viewBox', FIT[d.dataset.id])
+    })
+  }
 
   let root, tray, cabinet, msg, done, count, gathered = 0, onDone = null
 
@@ -187,6 +199,6 @@
   })
 
   window.herbCollect = {
-    start(next) { onDone = next; build(); root.hidden = false },
+    start(next) { onDone = next; build(); root.hidden = false; fitDrawn() },
   }
 })()

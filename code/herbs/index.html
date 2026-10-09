@@ -12,7 +12,7 @@
 
   <script src="./story.js?v=3"></script>
   <script src="./camera.js?v=3" defer></script>
-  <script src="./collect.js?v=4"></script>
+  <script src="./collect.js?v=5"></script>
   <script src="./herbs.js?v=15"></script>
 
   <style>
@@ -120,10 +120,10 @@
     .drawer { position:relative; display:flex; flex-direction:column; padding:0; min-height:0; border-radius:6px; background:none; cursor:grab; color:inherit; }
     .drawer .box { aspect-ratio:1.15; display:grid; place-items:center; border-radius:6px 6px 0 0; padding:4px;
       background:linear-gradient(#e6c28d, #c99a5c); box-shadow:inset 0 0 0 5px #b5844a, inset 0 10px 14px #0004; }
-    .drawer .pile { width:100%; max-height:100%; display:block; transition:transform .25s; }
+    /* every ingredient fills the same centred area of its drawer */
+    .drawer .pile { width:82%; height:72%; display:block; transition:transform .25s; }
     .drawer .pile.lifted { transition:none; filter:drop-shadow(0 8px 8px #0007); position:relative; z-index:2; }
     .drawer svg, .drawer img { width:100%; height:100%; display:block; object-fit:contain; -webkit-user-drag:none; user-select:none; }
-    .drawer .pile { aspect-ratio:1.5; }
     .drawer .front { display:grid; place-items:center; height:30px; border-radius:0 0 6px 6px; background:linear-gradient(#a8743d, #8a5a2b); box-shadow:inset 0 2px 0 #c08a4f; }
     .drawer .handle { width:34%; height:8px; border-radius:4px; background:linear-gradient(#f0d58c, #b88c3c); box-shadow:0 1px 2px #0007; }
     .drawer.taken .box { opacity:.55; }
