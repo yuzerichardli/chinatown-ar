@@ -1,67 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Chinatown AR — Tai Chi</title>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <!-- ============================================================
-       8th Wall WebAR stack (open-source, 2026 — no app key needed)
-       1) 8frame  : 8th Wall's A-Frame fork (vendored locally)
-       2) xrextras: loading screen + error handling
-       3) xr.js   : engine binary; SLAM via data-preload-chunks="slam"
-                    (also registers the <a-scene xrweb> component)
-       Runs in the browser on iPhone Safari + Android — NO app.
-       ============================================================ -->
-  <script src="./vendor/8frame-1.3.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js"
-          crossorigin="anonymous"></script>
-  <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
-          crossorigin="anonymous" data-preload-chunks="slam"></script>
+  <!-- Standard A-Frame over a plain live-camera video (same as code/herbs/).
+       The vendored 8frame fork waits for the 8th Wall engine before rendering,
+       so it is not used here. The master rides a camera rig, so no SLAM is needed. -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe-v1.3.0.min.js"></script>
 
-  <script src="./poses.js?v=13"></script>
+  <script src="./story.js?v=1"></script>
+  <script src="./camera.js?v=1" defer></script>
+  <script src="./poses.js?v=15"></script>
 
   <style>
+    body { margin: 0; background:#242329; }
+    [hidden] { display: none !important; }
+    #live-camera { position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+    a-scene { position:fixed!important; inset:0; z-index:1; background:transparent!important; pointer-events:none; }
+    #camera-help { position:fixed; top:16px; left:50%; transform:translateX(-50%); width:min(calc(100% - 32px),420px); z-index:10; padding:8px 12px; border-radius:12px; color:white; background:#242329dd; font:13px -apple-system,system-ui,sans-serif; text-align:center; }
+    #camera-help p { margin:4px 0; }
+    #camera-help button { background:none; color:#f0dfbe; font-size:13px; padding:8px; min-height:44px; }
     #hint {
-      position: fixed; left: 0; right: 0; bottom: 28px;
+      position: fixed; left: 0; right: 0; bottom: max(28px, env(safe-area-inset-bottom));
       text-align: center; pointer-events: none;
       font-family: -apple-system, system-ui, sans-serif;
       color: #fff; font-size: 16px; padding: 0 16px;
       text-shadow: 0 1px 4px rgba(0,0,0,0.7); z-index: 6;
     }
-    /* Transparent full-screen layer that catches taps to change pose. */
-    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; }
-    /* Full-screen story slides (shown after the 4 poses); camera stays behind */
-    #story {
-      position: fixed; inset: 0; background: transparent; display: none;
-      z-index: 5; pointer-events: none;
+    /* "Breathe in / out" prompt, synced to the master's breathing motion. */
+    #breath {
+      position: fixed; left: 0; right: 0; top: max(28px, env(safe-area-inset-top));
+      text-align: center; pointer-events: none; z-index: 6;
+      font: 300 22px -apple-system, system-ui, sans-serif; letter-spacing: 1.5px;
+      color: #fff6df; text-shadow: 0 1px 6px rgba(0,0,0,0.75);
     }
-    #story img { width: 100%; height: 100%; object-fit: contain; }
+    /* Transparent full-screen layer that catches drag / pinch / tap. */
+    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; touch-action: none; }
+    #arrival { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:32px; text-align:center; color:white; font-family:-apple-system,system-ui,sans-serif; }
+    #arrival h1 { font-size:clamp(26px,6vw,38px); line-height:1.15; margin:12px 0; max-width:520px; text-shadow:0 2px 8px #000,0 0 20px #0009; }
+    button { font:16px -apple-system,system-ui,sans-serif; border:0; border-radius:12px; background:#a93429; color:white; padding:15px 24px; min-height:48px; cursor:pointer; }
+    button:focus-visible { outline:3px solid #dfb861; outline-offset:3px; }
+    #arrive { min-width:180px; }
+    #landmark { width:min(64vw,34svh,300px); height:auto; filter:drop-shadow(0 4px 14px #0007); }
+    #story { position:fixed; inset:0; background:#faf5e9; color:#302f2b; display:flex; flex-direction:column; z-index:8; font-family:-apple-system,system-ui,sans-serif; padding-top:env(safe-area-inset-top); }
+    #story-page { flex:1; overflow:auto; overscroll-behavior:contain; padding:30px max(24px,calc((100vw - 760px)/2)); font-size:18px; line-height:1.7; }
+    #story-page p { margin:0 0 20px; }
+    #story-page:focus { outline:none; }
+    #story-page[lang="zh-Hans"] { line-height:1.95; }
+    #story-page .question { font-size:clamp(23px,5vw,32px); line-height:1.5; margin-top:30px; }
+    #story nav { display:flex; justify-content:space-between; gap:16px; padding:16px max(24px,calc((100vw - 760px)/2)) max(18px,env(safe-area-inset-bottom)); border-top:1px solid #ded3bd; background:#faf5e9; }
+    #story-back { background:#e9dfcd; color:#403b32; }
   </style>
 </head>
 <body>
+  <video id="live-camera" autoplay muted playsinline aria-hidden="true"></video>
+  <div id="camera-help" hidden><p id="camera-message" role="status"></p><button id="camera-retry">Try camera again</button></div>
   <a-scene
-    xrextras-loading
-    xrextras-runtime-error
-    renderer="colorManagement: true"
-    xrweb="allowedDevices: any; scale: absolute">
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    renderer="colorManagement: true; alpha: true"
+    background="transparent: true">
 
-    <!-- All three poses preloaded so switching is instant -->
+    <!-- All poses preloaded so switching is instant -->
     <a-assets>
-      <a-asset-item id="pose0" src="../../model/masters/tai-chi-pose.glb?v=2"></a-asset-item>
-      <a-asset-item id="pose1" src="../../model/masters/tai-chi-stance.glb?v=2"></a-asset-item>
-      <a-asset-item id="pose2" src="../../model/masters/blue-clad.glb?v=2"></a-asset-item>
-      <a-asset-item id="pose3" src="../../model/masters/prayer.glb?v=2"></a-asset-item>
+      <a-asset-item id="pose0" src="../../model/masters/tai-chi-pose.glb?v=3"></a-asset-item>
+      <a-asset-item id="pose1" src="../../model/masters/tai-chi-stance.glb?v=3"></a-asset-item>
+      <a-asset-item id="pose2" src="../../model/masters/blue-clad.glb?v=3"></a-asset-item>
+      <a-asset-item id="pose3" src="../../model/masters/prayer.glb?v=3"></a-asset-item>
     </a-assets>
 
     <!-- Camera-relative orbit rig. The master sits a fixed distance in front of
          you and faces you. Dragging spins this rig, so he travels around YOU on
-         a circle (you are the center) rather than spinning on the spot; pinch
-         zooms him. Because he's attached to the camera rig (not the room), he's
-         rock-steady — no world-tracking drift. All three poses share the same
-         spot; we toggle visibility so tapping swaps pose in place. -->
-    <a-camera position="0 0 0">
+         a circle rather than spinning on the spot; pinch zooms him. All poses
+         share the same spot; we toggle visibility so tapping swaps pose in place. -->
+    <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false">
       <a-entity id="orbitRig" rotation="0 0 0">
         <a-entity class="pose" id="poseEntity0" gltf-model="#pose0"
                   position="0 0 -2.5" rotation="0 0 0" scale="2.5 2.5 2.5"></a-entity>
@@ -78,8 +94,10 @@
     <a-light type="directional" intensity="0.8" position="1 2 1"></a-light>
   </a-scene>
 
-  <div id="story"><img id="storyimg" alt="story"></div>
-  <div id="tapcatcher"></div>
-  <div id="hint">Drag to move him around you · pinch to zoom · tap to change pose</div>
+  <section id="arrival" aria-labelledby="arrival-title"><img id="landmark" src="assets/red-sculpture.svg?v=2" alt="Drawing of the red lattice sculpture on the Rose Kennedy Greenway" draggable="false"><h1 id="arrival-title">Do you see the red sculpture at Rose Kennedy Greenway park?</h1><button id="arrive">Yes</button></section>
+  <div id="tapcatcher" hidden></div>
+  <div id="breath" hidden aria-hidden="true"></div>
+  <div id="hint" hidden></div>
+  <section id="story" hidden aria-label="Story and reflection"><article id="story-page" tabindex="-1"></article><nav><button id="story-back">Back</button><button id="story-next">Next</button></nav></section>
 </body>
 </html>

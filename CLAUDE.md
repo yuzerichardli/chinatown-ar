@@ -20,7 +20,7 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 ### Scene URLs
 | Scene | URL | Engine |
 |---|---|---|
-| 🥋 Tai-chi masters | `/code/interactive/` | 8th Wall |
+| 🥋 Tai-chi masters | `/code/interactive/` | Standard A-Frame + plain camera video |
 | 🎬 Movie screen (Films at the Gate) | `/code/screen/` | 8th Wall |
 | 🌿 Herbal soup game | `/code/herbs/` | Standard A-Frame + plain camera video |
 | 🦁 Lion dance (Phillips Square) | `/code/lion/` | Plain HTML + camera video |
@@ -45,10 +45,12 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 
 All 8th Wall scenes share the gesture model: **drag = orbit the object around you, pinch = zoom, tap = advance.**
 
-### 🥋 `code/interactive/` — Tai-chi  (`poses.js?v=13`)
-- Cycles **4 master poses** (3D, visibility-toggled — NOT model-swapped) → **2 full-screen story slides** → loops.
-- Models: `model/masters/{tai-chi-pose,tai-chi-stance,blue-clad,prayer}.glb` (`?v=2`).
-- Stories: `code/interactive/stories/taichi1.jpg`, `taichi2.jpg`.
+### 🥋 `code/interactive/` — Tai-chi  (`poses.js?v=15`)
+- **No 8th Wall** (same setup as herbs: standard A-Frame 1.3.0 + `camera.js`; motion-sensor dialog disabled).
+- Opens with a drawing of the red sculpture (`assets/red-sculpture.svg`) and **"Do you see the red sculpture at Rose Kennedy Greenway park?" → Yes**.
+- **4 master poses** (visibility-toggled — NOT model-swapped). The models are static scans (no skeleton), so motion is around them: 8 s breathing rise/sink with a "Breathe in / out" prompt, a ring of golden light points at his feet, and a flowing transition on tap (turn + fade into a rising light spiral, next pose turns out of it). After pose 4 → **text story pages** from `story.js` (English → Chinese → bilingual reflection → Replay).
+- Models: `model/masters/{tai-chi-pose,tai-chi-stance,blue-clad,prayer}.glb` (`?v=3`). Texture-patched: grey hair on all four, pose 1's white suit recoloured navy to match the others. Faces/proportions still differ (pose 1 is a different, realistic character) — a truly consistent elder master needs new Meshy models.
+- `stories/taichi*.jpg` are the old image slides, no longer used.
 
 ### 🎬 `code/screen/` — Movie screen  (`screen.js?v=4`)
 - A photo plays **on the screen face of `model/screen.glb`** (cover-cropped to fill, photo overlaid as a plane at `position 0 0.06 0.09`, size `1.49×1.05`).
