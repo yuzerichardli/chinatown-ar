@@ -31,6 +31,9 @@ drop targets around their openings. The table retains its original perspective.
 All three cups sit inward from the rim, with their full controls inside the
 tabletop ellipse. The liquid is pale, translucent golden tea with a light
 reflection and a brighter pouring stream, rather than opaque dark-brown liquid.
+Shared dishes are 17% of the table image width in four inset positions. Their
+basket/plate footprints fit the glass lazy Susan, regardless of drop order;
+the original sprite artwork and table perspective are unchanged.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera

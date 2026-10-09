@@ -16,8 +16,9 @@ img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none}#camera{pos
 #teapot-control{position:absolute;left:40%;top:13%;width:20%;padding:0;background:none;min-height:44px;touch-action:none;opacity:1;z-index:3;border-radius:50%}
 #teapot{display:block;width:100%;filter:drop-shadow(0 3px 3px #38220e4d);pointer-events:none}
 #shared-dishes{position:absolute;inset:0;pointer-events:none;z-index:2}
-.shared-dish{position:absolute;width:22%;filter:drop-shadow(0 3px 3px #38220e4d);animation:arrive .25s ease-out}
-.shared-dish:nth-child(1){left:19%;top:19%}.shared-dish:nth-child(2){right:19%;top:19%}.shared-dish:nth-child(3){left:27%;top:39%}.shared-dish:nth-child(4){right:27%;top:39%}
+/* Keep every basket/plate footprint inside the glass turntable, in any drop order. */
+.shared-dish{position:absolute;width:17%;filter:drop-shadow(0 3px 3px #38220e4d);animation:arrive .25s ease-out}
+.shared-dish:nth-child(1){left:23.5%;top:24%}.shared-dish:nth-child(2){right:23.5%;top:24%}.shared-dish:nth-child(3){left:31%;top:40%}.shared-dish:nth-child(4){right:31%;top:40%}
 #board.complete #table-setting{bottom:10%}
 #tea-cups{position:absolute;inset:0;pointer-events:none;z-index:2}
 .tea-cup{position:absolute;width:15%;min-height:44px;padding:0;aspect-ratio:1;background:none;opacity:1;pointer-events:auto;touch-action:none;transform:translate(-50%,-50%);border-radius:50%}

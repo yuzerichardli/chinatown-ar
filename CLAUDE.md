@@ -83,6 +83,7 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - Transparent softly shaded 3D-style food/teapot/cup sprites (`*-3d.png`) and a wood/glass lazy Susan (`lazy-susan.png`) match the textured objects in the other activities. The cup matches the original ivory/cobalt-blue teapot and uses an animated tea surface; the same pot image is used during drag and pour. The table image keeps its native perspective; items use small contact shadows. Original sprites remain unused for rollback. Generation/edit prompts and story context are in its `README.md`.
 - Table now grows to nearly full phone width and a much larger wide-screen size; cups are 15% of the table image width with at least 44px controls and expanded drag/drop targets.
 - Cups are inset from the tabletop rim (including the full control bounds); tea is pale/translucent gold with a clearer bright stream, not opaque coffee-brown.
+- Shared dishes are 17% of the tabletop image width and inset into four slots, keeping their basket/plate footprints on the glass lazy Susan in any drop order.
 - QR: `qr/dimsum.png` → `/code/dimsum/`. All other scene QR codes are unchanged. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 
 ## 4. Where the assets live  (IMPORTANT for continuity)

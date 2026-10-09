@@ -107,7 +107,7 @@ test('matching transparent 3D-style assets are used before, during, and after sh
   const html=fs.readFileSync(__dirname+'/index.html','utf8');
   assert.match(html,/id="table-surface" src="assets\/lazy-susan\.png"/);
   assert.match(html,/id="teapot" src="assets\/teapot-3d\.png"/);
-  assert.match(html,/dimsum\.css\?v=9/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=8/);
+  assert.match(html,/dimsum\.css\?v=10/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=8/);
   for (const asset of [...dishes.map(d=>d.asset),'teapot-3d.png','tea-cup-3d.png','lazy-susan.png']) {
     const png=fs.readFileSync(__dirname+'/assets/'+asset);
     assert.equal(png.readUInt8(25),6,asset+' must retain RGBA transparency');
@@ -156,6 +156,24 @@ test('all cup controls sit inside the tabletop ellipse, not across its edge',()=
     for(const dx of [-halfWidth,halfWidth]) for(const dy of [-halfHeight,halfHeight]) {
       const ellipse=Math.pow((x+dx-.5)/.455,2)+Math.pow((y+dy-.49)/.4,2);
       assert.ok(ellipse<1,`${id} cup crosses the table edge`);
+    }
+  }
+});
+test('all four basket/plate footprints stay inside the glass lazy Susan in every slot',()=>{
+  const css=fs.readFileSync(__dirname+'/dimsum.css','utf8');
+  const width=Number(css.match(/\.shared-dish\{[^}]*width:([\d.]+)%/)[1])/100;
+  for(let slot=1;slot<=4;slot++) {
+    const position=css.match(new RegExp('\\.shared-dish:nth-child\\('+slot+'\\)\\{(left|right):([\\d.]+)%;top:([\\d.]+)%'));
+    assert.ok(position,'missing dish slot '+slot);
+    const inset=Number(position[2])/100;
+    const left=position[1]==='left'?inset:1-inset-width,top=Number(position[3])/100;
+    // Lower steamer/plate silhouette envelope; leave the glass rim outside it.
+    for(let step=0;step<32;step++) {
+      const angle=step*Math.PI/16;
+      const x=left+width*(.5+.47*Math.cos(angle));
+      const y=top+width*1.5*(.70+.26*Math.sin(angle));
+      const ellipse=Math.pow((x-.5)/.32,2)+Math.pow((y-.42)/.25,2);
+      assert.ok(ellipse<1,`dish in slot ${slot} hangs off the glass lazy Susan`);
     }
   }
 });
