@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="t">
+  <title id="t">Drawing of the orange and green PlayCubes on the playground turf</title>
+  <!-- Flat illustration from a reference photo: the stacked PlayCubes
+       climbing structure on green turf, trees behind. -->
+  <defs>
+    <clipPath id="disc"><circle cx="320" cy="320" r="306"/></clipPath>
+    <!-- one PlayCube seen corner-on: top, left and right faces, with round holes -->
+    <g id="cube">
+      <path d="M0 -58 L50 -29 L0 0 L-50 -29Z" fill="var(--top)"/>
+      <path d="M-50 -29 L0 0 L0 58 L-50 29Z" fill="var(--left)"/>
+      <path d="M50 -29 L0 0 L0 58 L50 29Z" fill="var(--right)"/>
+      <ellipse cx="0" cy="-29" rx="27" ry="15" fill="var(--hole)"/>
+      <ellipse cx="-25" cy="14" rx="17" ry="25" transform="rotate(-28 -25 14)" fill="var(--hole)"/>
+      <ellipse cx="25" cy="14" rx="17" ry="25" transform="rotate(28 25 14)" fill="var(--hole)"/>
+    </g>
+  </defs>
+  <circle cx="320" cy="320" r="306" fill="#e3ecd6"/>
+  <g clip-path="url(#disc)">
+    <!-- soft trees behind -->
+    <circle cx="120" cy="200" r="110" fill="#cfdfbf"/>
+    <circle cx="530" cy="190" r="120" fill="#cfdfbf"/>
+    <circle cx="330" cy="130" r="90" fill="#d8e5c9"/>
+    <!-- turf -->
+    <path d="M-10 470 Q320 440 650 470 L650 660 L-10 660Z" fill="#6aa55a"/>
+    <ellipse cx="320" cy="520" rx="210" ry="20" fill="#3f6e36" opacity=".35"/>
+    <!-- PlayCubes stack (back row first) -->
+    <g transform="translate(320 300)">
+      <use href="#cube" transform="translate(-55 30)" style="--top:#8ad0a3;--left:#5aae7b;--right:#46966a;--hole:#2f6b4a"/>
+      <use href="#cube" transform="translate(55 30)" style="--top:#f6a466;--left:#ee7f34;--right:#d96a22;--hole:#a8481a"/>
+      <use href="#cube" transform="translate(0 -30)" style="--top:#8ad0a3;--left:#5aae7b;--right:#46966a;--hole:#2f6b4a"/>
+      <use href="#cube" transform="translate(-110 90)" style="--top:#f6a466;--left:#ee7f34;--right:#d96a22;--hole:#a8481a"/>
+      <use href="#cube" transform="translate(0 90)" style="--top:#f6a466;--left:#ee7f34;--right:#d96a22;--hole:#a8481a"/>
+      <use href="#cube" transform="translate(110 90)" style="--top:#8ad0a3;--left:#5aae7b;--right:#46966a;--hole:#2f6b4a"/>
+      <use href="#cube" transform="translate(-55 150)" style="--top:#8ad0a3;--left:#5aae7b;--right:#46966a;--hole:#2f6b4a"/>
+      <use href="#cube" transform="translate(55 150)" style="--top:#f6a466;--left:#ee7f34;--right:#d96a22;--hole:#a8481a"/>
+    </g>
+  </g>
+</svg>

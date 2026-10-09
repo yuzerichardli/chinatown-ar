@@ -1,21 +1,23 @@
 /* Films-at-the-Gate.
-   Scenes 1–8: photos play on the screen.glb screen face, cover-cropped to fill
-               it edge-to-edge (no white border, no stretching).
-   Scenes 9–10: story/description slides — the 3D screen is hidden and the image
-               is shown FULL-SCREEN on the phone, large and readable.
-   Gestures (photo scenes): drag = orbit, pinch = zoom, tap = next.
-   Tap also advances through the story slides and loops back to scene 1. */
+   Two opening questions (at Chinatown Gate park? → stand by the PlayCubes facing
+   the red brick wall) → 8 photos play on the screen.glb screen face,
+   cover-cropped to fill it edge-to-edge, with the 2007 video clip in place of
+   the 2007 photo (video.js) → story pages (English → Chinese →
+   bilingual reflection → Replay).
+   Gestures (photo scenes): drag = orbit, pinch = zoom, tap = next photo. */
 
 (function () {
   // ---- Tuning ----
-  const COUNT = 10            // total slides (img0..img9)
-  const STORY_FROM = 8        // idx >= 8 (pics 9 & 10) are full-screen stories
+  // photo indexes in order; the 2007 video clip takes the 2007 photo's place (pic02 is not used)
+  const SLIDES = [0, 'video', 2, 3, 4, 5, 6, 7]
+  const COUNT = SLIDES.length
   const PLANE_W = 1.49, PLANE_H = 1.05   // matches picplane geometry in index.html
   const ORBIT_SENS = 0.15
   const MIN_SCALE = 0.25, MAX_SCALE = 3.0
   // ----------------
 
-  let idx = 0, theta = 0, scale = 0.75
+  let idx = 0, theta = 0, scale = 1.25, pageIndex = 0
+  let state = 'arrival'   // arrival -> place -> photos -> story -> (replay) photos
 
   window.addEventListener('DOMContentLoaded', () => {
     const rig = document.getElementById('orbitRig')
@@ -24,11 +26,11 @@
     const hint = document.getElementById('hint')
     const surface = document.getElementById('tapcatcher')
     const story = document.getElementById('story')
-    const storyImg = document.getElementById('storyimg')
+    const storyPage = document.getElementById('story-page')
+    const storyNext = document.getElementById('story-next')
 
     const applyScale = () => group.setAttribute('scale', `${scale} ${scale} ${scale}`)
     const applyOrbit = () => rig.setAttribute('rotation', `0 ${theta} 0`)
-    const fname = (i) => `pictures/pic${String(i + 1).padStart(2, '0')}.jpg`
 
     // Cover-crop: scale the texture so the photo fills the whole plane with no
     // white bars and no distortion (centre-crop the overflow).
@@ -46,56 +48,97 @@
     }
     pic.addEventListener('materialtextureloaded', applyCover)
 
-    function show(i) {
-      idx = (i % COUNT + COUNT) % COUNT
-      if (idx >= STORY_FROM) {
-        // full-screen story slide
-        group.setAttribute('visible', 'false')
-        storyImg.src = fname(idx)
-        story.style.display = 'block'
-        if (hint) hint.textContent = `Story ${idx - STORY_FROM + 1}/${COUNT - STORY_FROM} · tap for next`
-      } else {
-        // photo on the 3D screen
-        story.style.display = 'none'
-        group.setAttribute('visible', 'true')
-        pic.setAttribute('material', 'src', '#img' + idx)
-        applyCover()
-        if (hint) hint.textContent = `Scene ${idx + 1}/${STORY_FROM} · drag · pinch · tap for next`
+    function showPhoto(i) {
+      idx = i; state = 'photos'
+      story.hidden = true; surface.hidden = false; hint.hidden = false
+      group.setAttribute('visible', 'true')
+      if (SLIDES[idx] === 'video') {
+        window.screenVideo.show(pic)
+        hint.textContent = `Scene ${idx + 1}/${COUNT} · Films at the Gate 2007 · tap for next`
+        return
       }
+      window.screenVideo.hide()
+      pic.setAttribute('material', 'src', '#img' + SLIDES[idx])
+      applyCover()
+      hint.textContent = `Scene ${idx + 1}/${COUNT} · drag · pinch · tap for next`
     }
+    function showStory(n) {
+      pageIndex = n; state = 'story'
+      window.screenVideo.hide()
+      group.setAttribute('visible', 'false')
+      surface.hidden = true; hint.hidden = true
+      storyPage.innerHTML = window.movieStoryPages[n]
+      storyPage.lang = n === 1 ? 'zh-Hans' : 'en'
+      story.hidden = false; storyPage.scrollTop = 0
+      storyNext.textContent = n === 2 ? 'Replay' : 'Next'
+      window.arCamera?.stop()
+      storyPage.focus()
+    }
+    const next = () => idx < COUNT - 1 ? showPhoto(idx + 1) : showStory(0)
 
-    // ---- gestures ----
-    let oneActive = false, startX = 0, startTheta = 0, dragged = false
-    let pinchActive = false, startPinch = 0, startScale = 0
-    const pinchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY)
-
-    surface.addEventListener('touchstart', (e) => {
-      if (e.touches.length >= 2) {
-        pinchActive = true; oneActive = false
-        startPinch = pinchDist(e.touches); startScale = scale
-      } else if (e.touches.length === 1) {
-        oneActive = true; pinchActive = false
-        startX = e.touches[0].clientX; startTheta = theta; dragged = false
-      }
-    }, { passive: false })
-
-    surface.addEventListener('touchmove', (e) => {
-      if (pinchActive && e.touches.length >= 2) {
-        scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, startScale * pinchDist(e.touches) / startPinch))
-        applyScale(); e.preventDefault()
-      } else if (oneActive && e.touches.length === 1) {
-        const dx = e.touches[0].clientX - startX
-        if (Math.abs(dx) > 8) dragged = true
-        theta = startTheta - dx * ORBIT_SENS
-        applyOrbit(); e.preventDefault()
-      }
-    }, { passive: false })
-
-    surface.addEventListener('touchend', (e) => {
-      if (oneActive && !dragged) show(idx + 1)
-      if (e.touches.length === 0) { oneActive = false; pinchActive = false }
+    group.setAttribute('visible', 'false')
+    document.getElementById('arrive').addEventListener('click', () => {
+      document.getElementById('arrival').hidden = true
+      document.getElementById('place').hidden = false
+      state = 'place'
+      document.getElementById('place-yes').focus()
+    })
+    document.getElementById('place-yes').addEventListener('click', () => {
+      document.getElementById('place').hidden = true
+      showPhoto(0)
+      window.arCamera?.open()   // retries, and shows the camera notice if it is still unavailable
+    })
+    storyNext.addEventListener('click', () => {
+      if (pageIndex < 2) return showStory(pageIndex + 1)
+      theta = 0; scale = 1.25; applyScale(); applyOrbit()
+      showPhoto(0); window.arCamera?.open()
+    })
+    document.getElementById('story-back').addEventListener('click', () => {
+      if (pageIndex > 0) return showStory(pageIndex - 1)
+      showPhoto(COUNT - 1); window.arCamera?.open()
     })
 
-    applyScale(); applyOrbit(); show(0)
+    // ---- gestures (pointer events: touch + mouse) ----
+    const pointers = new Map()
+    let startX = 0, startTheta = 0, dragged = false
+    let startPinch = 0, startScale = 0
+    const pinchDist = () => {
+      const [a, b] = [...pointers.values()]
+      return Math.hypot(a.x - b.x, a.y - b.y)
+    }
+
+    surface.addEventListener('pointerdown', (e) => {
+      if (state !== 'photos') return
+      surface.setPointerCapture(e.pointerId)
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (pointers.size === 2) { startPinch = pinchDist(); startScale = scale; dragged = true }
+      else if (pointers.size === 1) { startX = e.clientX; startTheta = theta; dragged = false }
+    })
+
+    surface.addEventListener('pointermove', (e) => {
+      if (!pointers.has(e.pointerId)) return
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (pointers.size >= 2) {
+        scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, startScale * pinchDist() / startPinch))
+        applyScale()
+      } else {
+        const dx = e.clientX - startX
+        if (Math.abs(dx) > 8) dragged = true
+        theta = startTheta - dx * ORBIT_SENS
+        applyOrbit()
+      }
+    })
+
+    function release(e) {
+      if (!pointers.delete(e.pointerId)) return
+      if (pointers.size === 1) {   // pinch ended: keep orbiting from the remaining finger
+        startX = [...pointers.values()][0].x; startTheta = theta
+      }
+      if (e.type === 'pointerup' && pointers.size === 0 && !dragged && state === 'photos') next()
+    }
+    surface.addEventListener('pointerup', release)
+    surface.addEventListener('pointercancel', release)
+
+    applyScale(); applyOrbit()
   })
 })()

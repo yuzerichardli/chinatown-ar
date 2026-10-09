@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="t">
+  <title id="t">Drawing of the tall red brick wall, with a glass tower at its right and a tree at its left</title>
+  <!-- Flat illustration from a reference photo: the tall red brick wall with
+       its pale patched marks, a glass tower beside it, and a tree in front. -->
+  <defs>
+    <clipPath id="disc"><circle cx="320" cy="320" r="306"/></clipPath>
+    <pattern id="bricks" width="40" height="20" patternUnits="userSpaceOnUse">
+      <rect width="40" height="20" fill="#b45a43"/>
+      <path d="M0 19.5H40M0 9.5H40M10 0V9.5M30 9.5V20" stroke="#9c4734" stroke-width="1.5"/>
+    </pattern>
+  </defs>
+  <circle cx="320" cy="320" r="306" fill="#d6e6f3"/>
+  <g clip-path="url(#disc)">
+    <!-- sky and clouds -->
+    <rect x="0" y="0" width="640" height="640" fill="#cfe2f3"/>
+    <ellipse cx="200" cy="70" rx="90" ry="34" fill="#f4f8fb"/>
+    <ellipse cx="420" cy="55" rx="70" ry="26" fill="#f4f8fb"/>
+    <!-- the wall, with a slanted roofline and rooftop vents -->
+    <path d="M40 130 L540 70 L560 640 L40 640Z" fill="url(#bricks)"/>
+    <path d="M40 130 L540 70 L541 86 L40 146Z" fill="#9c4734"/>
+    <rect x="390" y="66" width="18" height="24" fill="#a4503a"/>
+    <rect x="440" y="60" width="18" height="24" fill="#a4503a"/>
+    <rect x="490" y="54" width="18" height="24" fill="#a4503a"/>
+    <!-- pale patched marks -->
+    <rect x="170" y="370" width="16" height="270" fill="#c8b9a6" opacity=".85"/>
+    <rect x="170" y="362" width="110" height="12" fill="#c8b9a6" opacity=".85"/>
+    <rect x="264" y="370" width="16" height="270" fill="#c8b9a6" opacity=".85"/>
+    <rect x="410" y="300" width="130" height="12" fill="#c8b9a6" opacity=".75"/>
+    <rect x="250" y="250" width="60" height="10" fill="#c8b9a6" opacity=".7"/>
+    <rect x="330" y="470" width="200" height="70" rx="10" fill="#e1cdbd" opacity=".45"/>
+    <!-- glass tower at right -->
+    <path d="M540 0 L660 0 L660 640 L560 640Z" fill="#9fc0d8"/>
+    <path d="M570 0V640M600 0V640M630 0V640M545 120H660M548 240H660M552 360H660M556 480H660" stroke="#c9dbe8" stroke-width="3"/>
+    <!-- tree at left -->
+    <circle cx="60" cy="230" r="95" fill="#6f9a52"/>
+    <circle cx="20" cy="340" r="80" fill="#7aa75c"/>
+    <circle cx="120" cy="300" r="55" fill="#86b367"/>
+  </g>
+</svg>

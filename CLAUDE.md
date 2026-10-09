@@ -21,7 +21,7 @@ hosted free on **GitHub Pages**. Built for iPhone Safari **and** Android Chrome.
 | Scene | URL | Engine |
 |---|---|---|
 | 🥋 Tai-chi masters | `/code/interactive/` | Standard A-Frame + plain camera video |
-| 🎬 Movie screen (Films at the Gate) | `/code/screen/` | 8th Wall |
+| 🎬 Movie screen (Films at the Gate) | `/code/screen/` | Standard A-Frame + plain camera video |
 | 🌿 Herbal soup game | `/code/herbs/` | Standard A-Frame + plain camera video |
 | 🦁 Lion dance (Phillips Square) | `/code/lion/` | Plain HTML + camera video |
 | 🥟 Dim sum (Share the Table) | `/code/dimsum/` | Plain HTML + camera video |
@@ -53,10 +53,13 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - Models: `model/masters/{tai-chi-pose,tai-chi-stance,blue-clad,prayer}.glb` (`?v=3`). Texture-patched: grey hair on all four, pose 1's white suit recoloured navy to match the others. Faces/proportions still differ (pose 1 is a different, realistic character) — a truly consistent elder master needs new Meshy models.
 - `stories/taichi*.jpg` are the old image slides, no longer used.
 
-### 🎬 `code/screen/` — Movie screen  (`screen.js?v=4`)
-- A photo plays **on the screen face of `model/screen.glb`** (cover-cropped to fill, photo overlaid as a plane at `position 0 0.06 0.09`, size `1.49×1.05`).
-- 8 photos on the screen → **2 full-screen story slides** (camera shows behind, transparent) → loops.
-- Photos: `code/screen/pictures/pic01.jpg … pic10.jpg` (pic09/pic10 are the story slides).
+### 🎬 `code/screen/` — Movie screen  (`screen.js?v=8`)
+- **No 8th Wall** (same setup as herbs/tai-chi: standard A-Frame 1.3.0 + `camera.js`).
+- Two opening steps: **"Are you at Chinatown Gate park?" → Yes**, then two drawings (`assets/playcubes.svg`, `assets/brick-wall.svg`) captioned "Stand near the PlayCubes" / "Face the red brick wall" → Yes.
+- A photo plays **on the screen face of `model/screen.glb`** (cover-cropped to fill, photo overlaid as a plane at `position 0 0.06 0.09`, size `1.49×1.05`). Screen starts at scale 1.25.
+- 8 slides (`SLIDES` in `screen.js`): pic01, then the **2007 YouTube clip** in place of the 2007 photo, then pic03–pic08 → **text story pages** from `story.js` (English → Chinese → bilingual reflection → Replay).
+- **Video** (`video.js`): YouTube can't be a WebGL texture, so the official youtube-nocookie player is laid over the screen and warped onto its projected corners with a CSS `matrix3d` every frame (follows drag/pinch). Plays muted with a "Sound on" button; loops 0:00–0:35 then 2:29–2:37 (`SEGMENTS`). Needs internet. Video: "Films at the Gate 2007, Boston MA" (davnyc), `9B5ORsQVgp8`.
+- Unused now: `pictures/pic02.jpg` (2007 photo), `pic09/pic10` (old story image slides).
 
 ### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=14`)
 - **No 8th Wall.** Standard A-Frame 1.3.0 (jsDelivr) over a `getUserMedia` camera `<video>` (`camera.js`). Do NOT use the vendored `8frame` here: it waits for the 8th Wall engine (`xrloaded`) before rendering, so the herbs never appear without it.

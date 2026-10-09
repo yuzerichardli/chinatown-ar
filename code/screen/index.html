@@ -1,65 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Chinatown AR — Films at the Gate</title>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-  <!-- 8th Wall WebAR stack (same as the tai-chi scene) -->
-  <script src="./vendor/8frame-1.3.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js"
-          crossorigin="anonymous"></script>
-  <script async src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js"
-          crossorigin="anonymous" data-preload-chunks="slam"></script>
+  <!-- Standard A-Frame over a plain live-camera video (same as code/herbs/ and
+       code/interactive/). The vendored 8frame fork waits for the 8th Wall engine
+       before rendering, so it is not used here. -->
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe-v1.3.0.min.js"></script>
 
-  <script src="./screen.js?v=4"></script>
+  <script src="./story.js?v=2"></script>
+  <script src="./camera.js?v=1" defer></script>
+  <script src="./video.js?v=2"></script>
+  <script src="./screen.js?v=8"></script>
 
   <style>
+    body { margin: 0; background:#242329; }
+    [hidden] { display: none !important; }
+    #live-camera { position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+    a-scene { position:fixed!important; inset:0; z-index:1; background:transparent!important; pointer-events:none; }
+    #camera-help { position:fixed; top:16px; left:50%; transform:translateX(-50%); width:min(calc(100% - 32px),420px); z-index:10; padding:8px 12px; border-radius:12px; color:white; background:#242329dd; font:13px -apple-system,system-ui,sans-serif; text-align:center; }
+    #camera-help p { margin:4px 0; }
+    #camera-help button { background:none; color:#f0dfbe; font-size:13px; padding:8px; min-height:44px; }
     #hint {
-      position: fixed; left: 0; right: 0; bottom: 28px; text-align: center;
+      position: fixed; left: 0; right: 0; bottom: max(28px, env(safe-area-inset-bottom)); text-align: center;
       pointer-events: none; font-family: -apple-system, system-ui, sans-serif;
       color: #fff; font-size: 16px; padding: 0 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.7);
       z-index: 6;
     }
-    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; }
-    /* Full-screen story view (pics 9 & 10): large, readable, taps pass through */
-    #story {
-      position: fixed; inset: 0; background: transparent; display: none;
-      z-index: 5; pointer-events: none;
-    }
-    #story img { width: 100%; height: 100%; object-fit: contain; }
+    /* YouTube player warped onto the 3D screen by video.js; taps pass through to #tapcatcher */
+    #yt-wrap { position:fixed; left:0; top:0; z-index:2; transform-origin:0 0; pointer-events:none; background:#000; }
+    #yt-wrap iframe { width:100%; height:100%; border:0; pointer-events:none; display:block; }
+    #yt-sound { position:fixed; top:max(16px, env(safe-area-inset-top)); right:16px; z-index:7; padding:10px 16px; min-height:44px; font-size:14px; background:#242329cc; }
+    #tapcatcher { position: fixed; inset: 0; z-index: 3; background: transparent; touch-action: none; }
+    .opening { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px; padding:32px; text-align:center; color:white; font-family:-apple-system,system-ui,sans-serif; }
+    .opening h1 { font-size:clamp(26px,6vw,38px); line-height:1.15; margin:12px 0; max-width:520px; text-shadow:0 2px 8px #000,0 0 20px #0009; }
+    button { font:16px -apple-system,system-ui,sans-serif; border:0; border-radius:12px; background:#a93429; color:white; padding:15px 24px; min-height:48px; cursor:pointer; }
+    button:focus-visible { outline:3px solid #dfb861; outline-offset:3px; }
+    .opening button { min-width:180px; }
+    .landmarks { display:flex; gap:clamp(12px,4vw,28px); justify-content:center; }
+    .landmarks figure { margin:0; display:flex; flex-direction:column; align-items:center; gap:8px; }
+    .landmarks img { width:min(38vw,26svh,220px); height:auto; filter:drop-shadow(0 4px 14px #0007); }
+    .landmarks figcaption { font-size:clamp(18px,5vw,24px); font-weight:700; line-height:1.25; max-width:min(38vw,220px); text-align:center; text-shadow:0 2px 8px #000,0 0 20px #0009; }
+    #story { position:fixed; inset:0; background:#faf5e9; color:#302f2b; display:flex; flex-direction:column; z-index:8; font-family:-apple-system,system-ui,sans-serif; padding-top:env(safe-area-inset-top); }
+    #story-page { flex:1; overflow:auto; overscroll-behavior:contain; padding:30px max(24px,calc((100vw - 760px)/2)); font-size:18px; line-height:1.7; }
+    #story-page p { margin:0 0 20px; }
+    #story-page:focus { outline:none; }
+    #story-page[lang="zh-Hans"] { line-height:1.95; }
+    #story-page .question { font-size:clamp(23px,5vw,32px); line-height:1.5; margin-top:30px; }
+    #story nav { display:flex; justify-content:space-between; gap:16px; padding:16px max(24px,calc((100vw - 760px)/2)) max(18px,env(safe-area-inset-bottom)); border-top:1px solid #ded3bd; background:#faf5e9; }
+    #story-back { background:#e9dfcd; color:#403b32; }
   </style>
 </head>
 <body>
+  <video id="live-camera" autoplay muted playsinline aria-hidden="true"></video>
+  <div id="camera-help" hidden><p id="camera-message" role="status"></p><button id="camera-retry">Try camera again</button></div>
   <a-scene
-    xrextras-loading
-    xrextras-runtime-error
-    renderer="colorManagement: true"
-    xrweb="allowedDevices: any; scale: absolute">
+    embedded
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    renderer="colorManagement: true; alpha: true"
+    background="transparent: true">
 
     <a-assets>
       <a-asset-item id="screenModel" src="../../model/screen.glb?v=2"></a-asset-item>
       <img id="img0" src="pictures/pic01.jpg" crossorigin="anonymous">
-      <img id="img1" src="pictures/pic02.jpg" crossorigin="anonymous">
       <img id="img2" src="pictures/pic03.jpg" crossorigin="anonymous">
       <img id="img3" src="pictures/pic04.jpg" crossorigin="anonymous">
       <img id="img4" src="pictures/pic05.jpg" crossorigin="anonymous">
       <img id="img5" src="pictures/pic06.jpg" crossorigin="anonymous">
       <img id="img6" src="pictures/pic07.jpg" crossorigin="anonymous">
       <img id="img7" src="pictures/pic08.jpg" crossorigin="anonymous">
-      <img id="img8" src="pictures/pic09.jpg" crossorigin="anonymous">
-      <img id="img9" src="pictures/pic10.jpg" crossorigin="anonymous">
     </a-assets>
 
     <!-- The 3D movie-screen model + a photo plane sitting on its screen face,
          both inside one group so they move/zoom together. Camera-relative rig:
            drag  -> orbit around you,  pinch -> zoom,  tap -> next photo. -->
-    <a-camera position="0 0 0">
+    <a-camera position="0 0 0" look-controls="enabled: false" wasd-controls="enabled: false">
       <a-entity id="orbitRig" rotation="0 0 0">
-        <a-entity id="screenGroup" position="0 0 -3" scale="0.75 0.75 0.75">
+        <a-entity id="screenGroup" position="0 0 -3" scale="1.25 1.25 1.25">
           <!-- the cinema screen model -->
-          <a-entity id="screenModel" gltf-model="#screenModel"></a-entity>
+          <a-entity id="screenMesh" gltf-model="#screenModel"></a-entity>
           <!-- the photo, covering the screen face (+Z), unlit. The picplane is
                sized to the full screen opening; screen.js cover-crops the photo
                so it fills edge-to-edge with no white border. -->
@@ -75,8 +98,12 @@
     <a-light type="directional" intensity="0.6" position="1 2 2"></a-light>
   </a-scene>
 
-  <div id="story"><img id="storyimg" alt="story"></div>
-  <div id="tapcatcher"></div>
-  <div id="hint">Drag to move · pinch to zoom · tap for next scene</div>
+  <section id="arrival" class="opening" aria-labelledby="arrival-title"><h1 id="arrival-title">Are you at Chinatown Gate park?</h1><button id="arrive">Yes</button></section>
+  <section id="place" class="opening" hidden aria-label="Where to stand"><div class="landmarks"><figure><img src="assets/playcubes.svg?v=1" alt="Drawing of the orange and green PlayCubes playground" draggable="false"><figcaption>Stand near the PlayCubes</figcaption></figure><figure><img src="assets/brick-wall.svg?v=1" alt="Drawing of the tall red brick wall" draggable="false"><figcaption>Face the red brick wall</figcaption></figure></div><button id="place-yes">Yes</button></section>
+  <div id="yt-wrap" hidden><div id="yt-player"></div></div>
+  <button id="yt-sound" hidden>Sound on</button>
+  <div id="tapcatcher" hidden></div>
+  <div id="hint" hidden></div>
+  <section id="story" hidden aria-label="Story and reflection"><article id="story-page" tabindex="-1"></article><nav><button id="story-back">Back</button><button id="story-next">Next</button></nav></section>
 </body>
 </html>
