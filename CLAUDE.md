@@ -71,12 +71,12 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 
 ---
 
-### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=2`)
+### 🥟 `code/dimsum/` — Dim sum sharing (`dimsum.js?v=3`)
 - Same simple interaction pattern as herbs: **drag four dishes onto one shared table** (or tap a dish, then the table).
 - No matching requests, tray rotation, tea-pouring stage, timer, or score. The teapot is decorative.
 - Opens with **"Are you at a dim sum restaurant?" → Yes**; no restaurant has been chosen or location detected.
-- After four dishes → **"Dim sum ready!"** → Continue → English, Chinese, bilingual reflection → Replay.
-- All game elements, counters, and the camera are hidden during the story. Replay clears the table.
+- Word-free game view (food/table plus Continue). Sharing dishes is optional; Continue works immediately → English, Chinese, bilingual reflection → Replay.
+- All game elements and the camera are hidden during the story. Back preserves a partial table; Replay clears it.
 - Photographic transparent food assets are in `code/dimsum/assets/`; generation prompts and story context are documented in its `README.md`.
 - QR: `qr/dimsum.png` → `/code/dimsum/`. Tests: `node --test code/dimsum/dimsum.test.cjs`.
 

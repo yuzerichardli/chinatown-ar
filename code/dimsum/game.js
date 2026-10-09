@@ -29,8 +29,12 @@
         if (state.shared.length === dishes.length) state.phase = 'ready';
         return true;
       },
-      read() { if (state.phase === 'ready') state.phase = 'story'; },
-      returnToTable() { if (state.phase === 'story') state.phase = 'ready'; }
+      read() {
+        if (['sharing', 'ready'].includes(state.phase)) { state.phase = 'story'; state.selected = null; }
+      },
+      returnToTable() {
+        if (state.phase === 'story') state.phase = state.shared.length === dishes.length ? 'ready' : 'sharing';
+      }
     };
   }
   return { dishes, createGame };

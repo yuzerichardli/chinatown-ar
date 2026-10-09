@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#843a2e">
   <meta name="description" content="Bring four dim sum dishes to a shared table in this simple Chinatown AR mini game.">
   <title>Dim Sum · Share the Table</title>
-  <link rel="stylesheet" href="dimsum.css?v=2">
-  <script src="game.js?v=2" defer></script>
-  <script src="dimsum.js?v=2" defer></script>
+  <link rel="stylesheet" href="dimsum.css?v=3">
+  <script src="game.js?v=3" defer></script>
+  <script src="dimsum.js?v=3" defer></script>
 </head>
 <body>
   <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
@@ -25,29 +25,19 @@
       <p class="arrival-note">Take a seat. There’s always room to share.<br><span lang="zh-Hans">坐下来，一起分享。</span></p>
     </section>
 
-    <section id="experience" hidden aria-labelledby="scene-title">
-      <header>
-        <p class="eyebrow">DIM SUM · 点心</p>
-        <h1 id="scene-title">Share the table</h1>
-        <p id="instruction">Drag the dishes onto the table to share.</p>
-        <p id="instruction-zh" lang="zh-Hans">把点心拖到餐桌上，一起分享。</p>
-        <p id="counter" class="counter" aria-live="polite">0 / 4 dishes shared · 已分享点心</p>
-      </header>
-
+    <section id="experience" hidden aria-label="Dim sum sharing">
       <div id="board" aria-label="Four dim sum dishes and a shared table">
         <div id="dishes"></div>
         <button id="shared-table" aria-label="Place the selected dish on the shared table">
           <span class="table-surface" aria-hidden="true"></span>
           <img id="teapot" src="assets/teapot.png" alt="" draggable="false">
-          <span id="table-hint">Share here · 一起分享</span>
           <span id="shared-dishes" aria-hidden="true"></span>
         </button>
       </div>
 
       <div class="controls">
-        <p id="status" role="status">Loading the table… · 正在准备点心…</p>
-        <p id="tap-hint" class="small">Or tap a dish, then tap the table.<br><span lang="zh-Hans">也可以先点点心，再点餐桌。</span></p>
-        <button id="continue" hidden>Tap to continue<br><span lang="zh-Hans">轻触继续</span></button>
+        <p id="status" class="sr-only" role="status"></p>
+        <button id="continue">Tap to continue<br><span lang="zh-Hans">轻触继续</span></button>
       </div>
     </section>
 

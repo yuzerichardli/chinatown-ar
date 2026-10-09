@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const { createGame, dishes } = require('./game.js');
 
-test('four dishes, one table; no duplicate shares or premature Continue', () => {
+test('four optional dishes, one table; no duplicate shares', () => {
   const game = createGame(); game.read(); assert.equal(game.state.phase, 'arrival');
   assert.equal(game.share('har-gow'), false); game.start();
   assert.equal(game.share('missing'), false);
@@ -12,6 +12,17 @@ test('four dishes, one table; no duplicate shares or premature Continue', () => 
   assert.equal(game.state.phase, 'ready'); assert.equal(game.state.shared.length, 4);
   game.read(); assert.equal(game.state.phase, 'story'); game.returnToTable(); assert.equal(game.state.phase, 'ready');
   game.reset(); game.start(); assert.deepEqual(game.state, {phase:'sharing', selected:null, shared:[]});
+});
+test('Continue works after zero, one, two, or three dishes; Back preserves the partial table', () => {
+  for (const count of [0, 1, 2, 3]) {
+    const game = createGame(); game.start();
+    dishes.slice(0, count).forEach(d => game.share(d.id));
+    game.select(dishes[count].id); game.read();
+    assert.equal(game.state.phase, 'story'); assert.equal(game.state.selected, null);
+    game.returnToTable(); assert.equal(game.state.phase, 'sharing');
+    assert.equal(game.state.shared.length, count);
+    assert.equal(game.share(dishes[count].id), true);
+  }
 });
 test('selection toggles and clears when a dish is shared', () => {
   const game = createGame(); game.start(); game.select('har-gow'); assert.equal(game.state.selected, 'har-gow');
@@ -34,7 +45,7 @@ function element() {
   };
 }
 function harness(mediaDevices) {
-  const ids=['arrival','arrive','camera','experience','board','dishes','shared-table','teapot','shared-dishes','table-hint','tap-hint','status','scene-title','instruction','instruction-zh','counter','continue','camera-controls','enable-camera','camera-status','reading','page','back','next'];
+  const ids=['arrival','arrive','camera','experience','board','dishes','shared-table','teapot','shared-dishes','status','continue','camera-controls','enable-camera','camera-status','reading','page','back','next'];
   const el=Object.fromEntries(ids.map(id=>[id,element()]));el.experience.hidden=true;el.reading.hidden=true;
   const document=element(),window=element();document.hidden=false;document.body=element();
   document.getElementById=id=>el[id];document.createElement=()=>element();let game;
@@ -48,16 +59,33 @@ const down={isPrimary:true,button:0,pointerId:1,clientX:200,clientY:200};
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 test('controller: tap to share, completion, clean story screens, EN/ZH/reflection, Back, Replay',()=>{
   const h=harness();h.el.arrive.fire('click');h.shareAll();
-  assert.equal(h.game.state.phase,'ready');assert.equal(h.el.continue.hidden,false);assert.equal(h.el.counter.hidden,true);
-  assert.equal(h.el['shared-dishes'].children.length,4);assert.equal(h.el['scene-title'].textContent,'Dim sum ready!');
+  assert.equal(h.game.state.phase,'ready');assert.equal(h.el.continue.hidden,false);
+  assert.equal(h.el['shared-dishes'].children.length,4);
   h.el.continue.fire('click');assert.equal(h.el.experience.hidden,true);assert.equal(h.el['camera-controls'].hidden,true);assert.equal(h.el.camera.hidden,true);
   assert.equal(h.el.reading.hidden,false);assert.match(h.el.page.innerHTML,/More than a meal/);
   h.el.back.fire('click');assert.equal(h.game.state.phase,'ready');assert.equal(h.el['shared-dishes'].children.length,4);
   h.el.continue.fire('click');h.el.next.fire('click');assert.equal(h.el.page.lang,'zh-Hans');assert.match(h.el.page.innerHTML,/不只是一顿饭/);
   h.el.next.fire('click');assert.match(h.el.page.innerHTML,/Who would you invite/);h.el.next.fire('click');
   assert.equal(h.game.state.phase,'sharing');assert.equal(h.el.reading.hidden,true);assert.equal(h.el.experience.hidden,false);
-  assert.equal(h.el['shared-dishes'].children.length,0);assert.equal(h.el.counter.hidden,false);assert.equal(h.el['camera-controls'].hidden,false);
+  assert.equal(h.el['shared-dishes'].children.length,0);assert.equal(h.el.continue.hidden,false);assert.equal(h.el['camera-controls'].hidden,true);
   dishes.forEach(d=>assert.equal(h.dish(d.id).hidden,false));
+});
+test('controller: Continue is available immediately and after any partial interaction',()=>{
+  for (const count of [0, 1, 2, 3]) {
+    const h=harness();h.el.arrive.fire('click');assert.equal(h.el.continue.hidden,false);
+    dishes.slice(0,count).forEach(d=>{h.dish(d.id).fire('click');h.el['shared-table'].fire('click');});
+    h.el.continue.fire('click');assert.equal(h.game.state.phase,'story');assert.equal(h.el.experience.hidden,true);
+    h.el.back.fire('click');assert.equal(h.game.state.phase,'sharing');assert.equal(h.el.continue.hidden,false);
+    assert.equal(h.el['shared-dishes'].children.length,count);
+    assert.equal(h.dish(dishes[count].id).disabled,false);
+  }
+});
+test('gameplay has no visible headings, instructions, counters, or dish labels',()=>{
+  const html=fs.readFileSync(__dirname+'/index.html','utf8');
+  const scene=html.slice(html.indexOf('<section id="experience"'),html.indexOf('<aside id="camera-controls"'));
+  assert.doesNotMatch(scene,/<header|<h1|id="(?:counter|instruction|instruction-zh|tap-hint|table-hint)"/);
+  assert.match(scene,/id="continue"/);assert.match(scene,/class="sr-only" role="status"/);
+  const h=harness();dishes.forEach(d=>assert.doesNotMatch(h.dish(d.id).innerHTML,/dish-label|<span/));
 });
 test('controller: drag/drop, outside drop, cancellation and blur restore dishes',()=>{
   const h=harness();h.el.arrive.fire('click');const dish=h.dish('har-gow');

@@ -8,14 +8,14 @@
   const pages = [
     {
       lang: 'en', title: 'More than a meal', label: '01 / THE STORY',
-      body: `<p>You just brought different dishes to one shared table. Dim sum is closely associated with the Cantonese tradition of <em>yum cha</em> — gathering over tea and small dishes. People come with family or friends, choose different things to share, and spend time together.</p>
+      body: `<p>Dim sum brings different dishes to one shared table. It is closely associated with the Cantonese tradition of <em>yum cha</em> — gathering over tea and small dishes. People come with family or friends, choose different things to share, and spend time together.</p>
         <p>The food gives everyone something to talk about: a favourite dumpling, a dish someone has never tried, or a taste that brings back a memory. Sharing a dish can be a small way to include someone else.</p>
         <p>In a Chinatown restaurant, a table can be a place to catch up, introduce a friend to familiar food, or spend time with another generation. The meal matters, but so does the company.</p>
         <p class="note">About yum cha: <a href="https://guide.michelin.com/hk/en/best-of/best-dim-sum-yun-cha-hong-kong" target="_blank" rel="noopener noreferrer">MICHELIN Guide</a>. This is a general cultural story, not a quotation from a local interview.</p>`
     },
     {
       lang: 'zh-Hans', title: '不只是一顿饭', label: '02 / 故事',
-      body: `<p>刚才，你把不同的点心放到同一张桌子上，一起分享。点心与粤式「饮茶」的传统紧密相连：亲朋好友围坐在一起，喝茶、吃点心，也聊聊天。大家点几样不同的食物，一起分享，享受相聚的时光。</p>
+      body: `<p>点心让不同的味道来到同一张桌子上，一起分享。点心与粤式「饮茶」的传统紧密相连：亲朋好友围坐在一起，喝茶、吃点心，也聊聊天。大家点几样不同的食物，一起分享，享受相聚的时光。</p>
         <p>食物也让人有话可聊：一道喜欢的点心，一种还没尝过的味道，或者一口熟悉食物带来的回忆。递过去一笼点心，也是邀请别人一起参与的小小举动。</p>
         <p>在唐人街的餐厅里，一张桌子可以让朋友聊聊近况，让新朋友尝尝熟悉的味道，也让不同年纪的人有机会坐在一起。重要的不只是吃了什么，还有和谁一起吃。</p>
         <p class="note">饮茶文化参考：<a href="https://guide.michelin.com/hk/en/best-of/best-dim-sum-yun-cha-hong-kong" target="_blank" rel="noopener noreferrer">米其林指南</a>。这是一般性的文化故事，并非当地访谈引文。</p>`
@@ -33,7 +33,7 @@
     node.className = 'dish'; node.dataset.dish = dish.id; node.disabled = true;
     node.setAttribute('aria-label', `${dish.en} · ${dish.zh}: select to share`);
     node.setAttribute('aria-pressed', 'false');
-    node.innerHTML = `<img src="assets/${dish.id}.png" alt="" draggable="false"><span class="dish-label">${dish.en}<span lang="zh-Hans">${dish.zh}</span></span>`;
+    node.innerHTML = `<img src="assets/${dish.id}.png" alt="" draggable="false">`;
     $('dishes').append(node); dishNodes.set(dish.id, node);
     node.addEventListener('click', event => {
       if (event.detail !== 0 && performance.now() - lastDragAt < 350) return;
@@ -100,13 +100,8 @@
   function render() {
     const complete = ['ready', 'story'].includes(game.state.phase);
     $('board').classList.toggle('complete', complete);
-    $('scene-title').textContent = complete ? 'Dim sum ready!' : 'Share the table';
-    $('instruction').textContent = complete ? 'Good food tastes better together.' : 'Drag the dishes onto the table to share.';
-    $('instruction-zh').textContent = complete ? '一起吃，才更有滋味。' : '把点心拖到餐桌上，一起分享。';
-    $('counter').hidden = complete;
-    $('counter').textContent = `${game.state.shared.length} / 4 dishes shared · 已分享点心`;
-    $('tap-hint').hidden = complete; $('table-hint').hidden = game.state.shared.length > 0;
-    $('continue').hidden = game.state.phase !== 'ready';
+    $('continue').hidden = !['sharing', 'ready'].includes(game.state.phase);
+    $('camera-controls').hidden = game.state.phase !== 'arrival';
     $('shared-table').disabled = complete;
     for (const dish of dishes) {
       const node = dishNodes.get(dish.id);
@@ -167,12 +162,12 @@
     clearDrag();
     if (replay) { game.reset(); game.start(); $('shared-dishes').replaceChildren(); }
     else game.returnToTable();
-    $('reading').hidden = true; $('experience').hidden = false; $('camera-controls').hidden = false; $('camera').hidden = false;
+    $('reading').hidden = true; $('experience').hidden = false; $('camera').hidden = false;
     render(); status(replay ? 'Bring everyone’s favourites together. · 把大家喜欢的点心放在一起。' : 'A little of everything, for everyone. · 各样点心，一起分享。');
     if (replay) dishNodes.get(dishes[0].id).focus(); else $('continue').focus();
     openCamera();
   }
-  $('continue').addEventListener('click', () => { if (game.state.phase === 'ready') showPage(0); });
+  $('continue').addEventListener('click', () => { if (['sharing', 'ready'].includes(game.state.phase)) showPage(0); });
   $('next').addEventListener('click', () => { if (pageIndex < pages.length - 1) showPage(pageIndex + 1); else returnToTable(true); });
   $('back').addEventListener('click', () => { if (pageIndex > 0) showPage(pageIndex - 1); else returnToTable(false); });
   window.addEventListener('blur', clearDrag);

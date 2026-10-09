@@ -6,9 +6,11 @@ QR: `../../qr/dimsum.png` (same directory as the other scene QR codes).
 One simple interaction, following the herbal-soup game: drag four dishes onto
 one shared table. No matching requests, rotation, timer, score, or tea-pouring
 stage. A tap-a-dish → tap-the-table alternative also supports keyboard input.
-After all four dishes, tap Continue for English, Chinese, and bilingual
-reflection pages, then Replay. All game objects and the camera are hidden
-while reading. Back returns to the completed table; Replay clears it.
+The game view has no visible labels, instructions, headings, or counters.
+Continue is available immediately: sharing any or all of the dishes is optional.
+Continue opens English, Chinese, and bilingual reflection pages, then Replay.
+All game objects and the camera are hidden while reading. Back preserves the
+table as it was; Replay clears it. The arrival question and story text remain.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera
