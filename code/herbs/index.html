@@ -12,7 +12,8 @@
 
   <script src="./story.js?v=3"></script>
   <script src="./camera.js?v=3" defer></script>
-  <script src="./herbs.js?v=14"></script>
+  <script src="./collect.js?v=4"></script>
+  <script src="./herbs.js?v=15"></script>
 
   <style>
     body { margin: 0; background:#242329; }
@@ -102,6 +103,35 @@
     #story-page .question { font-size:clamp(23px,5vw,32px); line-height:1.5; margin-top:30px; }
     #story nav { display:flex; justify-content:space-between; padding:16px max(24px,calc((100vw - 760px)/2)) max(18px,env(safe-area-inset-bottom)); border-top:1px solid #ded3bd; background:#faf5e9; gap:16px; }
     #story-back { background:#e9dfcd; color:#403b32; }
+    /* ---- step 1: collect the ingredients from the herbal-store drawers ---- */
+    #collect { position:fixed; inset:0; z-index:8; display:flex; flex-direction:column; align-items:center; gap:10px;
+      padding:max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+      font-family:-apple-system,system-ui,sans-serif; color:#fff; background:linear-gradient(#24232900 0%, #241a12cc 45%); }
+    #collect-msg { margin:0; max-width:520px; text-align:center; font-size:16px; line-height:1.4; min-height:2.8em; text-shadow:0 1px 6px #000; }
+    #tray { position:relative; width:min(58vw, 26svh, 250px); aspect-ratio:1; flex:none; }
+    #tray .bowl { position:absolute; inset:0; border-radius:50%;
+      background:repeating-radial-gradient(circle at 50% 50%, #d7b77c 0 5px, #c49d5d 5px 7px), #d1ad6d;
+      box-shadow:inset 0 0 0 9px #a77b3e, inset 0 6px 18px #0006, 0 8px 18px #0007; }
+    #tray.pop { animation:plop .4s ease; }
+    #tray-count { position:absolute; left:50%; bottom:-6px; transform:translateX(-50%); font:700 18px -apple-system,system-ui,sans-serif; text-shadow:0 1px 4px #000; }
+    #tray .gathered { position:absolute; pointer-events:none; filter:drop-shadow(0 2px 2px #0006); }
+    #cabinet { flex:none; width:min(100%, 560px, 74svh); margin:auto 0; display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;
+      padding:12px; border-radius:10px; background:linear-gradient(#6b4423, #4e2f17); box-shadow:0 10px 24px #000a, inset 0 2px 0 #8a5a2b; touch-action:none; }
+    .drawer { position:relative; display:flex; flex-direction:column; padding:0; min-height:0; border-radius:6px; background:none; cursor:grab; color:inherit; }
+    .drawer .box { aspect-ratio:1.15; display:grid; place-items:center; border-radius:6px 6px 0 0; padding:4px;
+      background:linear-gradient(#e6c28d, #c99a5c); box-shadow:inset 0 0 0 5px #b5844a, inset 0 10px 14px #0004; }
+    .drawer .pile { width:100%; max-height:100%; display:block; transition:transform .25s; }
+    .drawer .pile.lifted { transition:none; filter:drop-shadow(0 8px 8px #0007); position:relative; z-index:2; }
+    .drawer svg, .drawer img { width:100%; height:100%; display:block; object-fit:contain; -webkit-user-drag:none; user-select:none; }
+    .drawer .pile { aspect-ratio:1.5; }
+    .drawer .front { display:grid; place-items:center; height:30px; border-radius:0 0 6px 6px; background:linear-gradient(#a8743d, #8a5a2b); box-shadow:inset 0 2px 0 #c08a4f; }
+    .drawer .handle { width:34%; height:8px; border-radius:4px; background:linear-gradient(#f0d58c, #b88c3c); box-shadow:0 1px 2px #0007; }
+    .drawer.taken .box { opacity:.55; }
+    .drawer.shake { animation:shake .45s ease; }
+    @keyframes shake { 0%,100% { transform:translateX(0) } 20% { transform:translateX(-7px) } 40% { transform:translateX(7px) } 60% { transform:translateX(-5px) } 80% { transform:translateX(4px) } }
+    .flying { position:fixed; z-index:9; pointer-events:none; transition:left .6s cubic-bezier(.3,.7,.3,1), top .6s cubic-bezier(.3,.7,.3,1), width .6s, height .6s; filter:drop-shadow(0 6px 8px #0007); }
+    .flying svg, #tray .gathered svg, .flying img, #tray .gathered img { width:100%; height:100%; display:block; object-fit:contain; }
+    #collect-done { flex:none; min-width:200px; }
     /* completion reveal: full bowl of herbal soup */
     #reveal {
       position: fixed; inset: 0; background: #000; opacity: 0; pointer-events: none;
@@ -148,6 +178,12 @@
   </a-scene>
 
   <section id="arrival" aria-labelledby="arrival-title"><img id="landmark" src="assets/yellow-sign.svg?v=2" alt="Drawing of the yellow Zhang Wellness Center sign" draggable="false"><h1 id="arrival-title">Do you see the yellow sign at Zhang Wellness Center?</h1><button id="arrive">Yes</button></section>
+  <section id="collect" hidden aria-label="Collect the soup ingredients from the herbal store drawers">
+    <div id="tray" aria-hidden="true"><div class="bowl"></div><div id="tray-count">0/4</div></div>
+    <p id="collect-msg" role="status"></p>
+    <div id="cabinet"></div>
+    <button id="collect-done" hidden>Cook the soup</button>
+  </section>
   <div id="dragsurface" hidden></div>
   <div id="pot" hidden>
     <div class="bowl" id="bowl">

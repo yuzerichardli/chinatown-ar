@@ -14,7 +14,7 @@
   const IDS = ['herb0', 'herb1', 'herb2', 'herb3']
 
   let dragging = null, collected = 0, placed = false
-  let state = 'arrival'   // arrival -> playing -> brewing -> soup -> story -> restart
+  let state = 'arrival'   // arrival -> collect -> playing -> brewing -> soup -> story -> restart (collect)
 
   window.addEventListener('DOMContentLoaded', () => {
     const scene = document.querySelector('a-scene')
@@ -32,11 +32,22 @@
     const bowlFront = document.getElementById('bowl-front')
     const ents = IDS.map((id) => document.getElementById(id))
     ents.forEach(e => e.setAttribute('visible', 'false'))
-    document.getElementById('arrive').addEventListener('click', () => {
-      document.getElementById('arrival').hidden = true
+    // Step 1 (collect.js): pick the four soup ingredients from the herbal-store drawers.
+    function collect() {
+      state = 'collect'
+      surface.hidden = true; pot.hidden = true; potFront.hidden = true; hint.hidden = true
+      ents.forEach(e => e.setAttribute('visible', 'false'))
+      window.herbCollect.start(cook)
+    }
+    // Step 2: drag the four ingredients into the soup pot.
+    function cook() {
       surface.hidden = false; pot.hidden = false; potFront.hidden = false; hint.hidden = false
       ents.forEach(e => e.setAttribute('visible', 'true'))
       state = 'playing'
+    }
+    document.getElementById('arrive').addEventListener('click', () => {
+      document.getElementById('arrival').hidden = true
+      collect()
       window.herbCamera?.open()   // retries, and shows the camera notice if it is still unavailable
     })
 
@@ -130,7 +141,7 @@
     }
     function restart() {
       reveal.style.opacity = '0'
-      story.hidden = true; surface.hidden = false; hint.hidden = false
+      story.hidden = true
       window.herbCamera?.open()
       pot.style.display = ''; potFront.style.display = ''
       collected = 0; countEl.textContent = '0/4'
@@ -141,7 +152,7 @@
       })
       layout()
       if (hint) hint.textContent = 'Drag each ingredient into the soup pot'
-      state = 'playing'
+      collect()
     }
     function advancePost() {
       if (state === 'soup') showStory(1)

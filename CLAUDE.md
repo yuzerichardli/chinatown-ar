@@ -61,12 +61,13 @@ All 8th Wall scenes share the gesture model: **drag = orbit the object around yo
 - **Video** (`video.js`): YouTube can't be a WebGL texture, so the official youtube-nocookie player is laid over the screen and warped onto its projected corners with a CSS `matrix3d` every frame (follows drag/pinch). Plays muted with a "Sound on" button; loops 0:00–0:35 then 2:29–2:37 (`SEGMENTS`). Needs internet. Video: "Films at the Gate 2007, Boston MA" (davnyc), `9B5ORsQVgp8`.
 - Unused now: `pictures/pic02.jpg` (2007 photo), `pic09/pic10` (old story image slides).
 
-### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=14`)
+### 🌿 `code/herbs/` — Herbal soup game  (`herbs.js?v=15`, `collect.js?v=4`)
 - **No 8th Wall.** Standard A-Frame 1.3.0 (jsDelivr) over a `getUserMedia` camera `<video>` (`camera.js`). Do NOT use the vendored `8frame` here: it waits for the 8th Wall engine (`xrloaded`) before rendering, so the herbs never appear without it.
 - Opens with a drawing of the yellow sign (`assets/yellow-sign.svg`) and **"Do you see the yellow sign at Zhang Wellness Center?" → Yes** (same pattern as `code/lion/`; no GPS check).
-- 4 herbs float (head-locked); **drag each into the clay pot** (pointer events: touch + mouse). Each drop → bubbles + pot bounce; the ingredient floats in the water. The pot is drawn twice — `#pot` behind the 3D canvas and `#pot-front` (masked to the front lip/body) in front — so dropped herbs look inside the pot.
+- **Step 1 — herbal-store drawers** (`collect.js`): 6 unlabelled, shuffled drawers (ginseng, goji, red dates, Chinese yam + decoys star anise, chrysanthemum). Tap or drag the right four into the bamboo tray; decoys shake with a message. All four → **Cook the soup**. The four soup ingredients are pictures of the same GLBs as the pot game (`assets/ingredients/*.png`, rendered with the pot game's lights, transparent background); the decoys are drawn SVG.
+- **Step 2 — pot:** 4 herbs float (head-locked); **drag each into the clay pot** (pointer events: touch + mouse). Each drop → bubbles + pot bounce; the ingredient floats in the water. The pot is drawn twice — `#pot` behind the 3D canvas and `#pot-front` (masked to the front lip/body) in front — so dropped herbs look inside the pot.
 - After the **4th** drop → brewing → **soup reveal** (`assets/soup_transition.jpg`) → tap → **text story pages** from `story.js` (English → Chinese → bilingual reflection → Replay). Camera stops during the story and restarts on replay.
-- State machine in `herbs.js`: `arrival → playing → brewing → soup → story → (restart)`.
+- State machine in `herbs.js`: `arrival → collect → playing → brewing → soup → story → (restart → collect)`.
 - Models: `model/herbs/{jujubes,goji,ginseng,breadsticks}.glb` (decimated to ~100k faces each).
 
 ---
