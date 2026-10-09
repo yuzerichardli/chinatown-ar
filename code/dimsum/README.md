@@ -10,7 +10,7 @@ or score. A tap-a-dish → tap-the-table alternative also supports keyboard inpu
 The dish-sharing view has no visible labels, instructions, headings, or counters.
 Its Next button is available immediately: sharing any or all dishes is optional.
 Next places any remaining dishes on the table and adds three matching cups
-around its edge, without removing the existing table or placed dishes. One line
+around the table, without removing the existing table or placed dishes. One line
 says “Drag the teapot to fill each cup.” Drop the pot over each cup opening to
 trigger a tilt, tea stream, filling tea surface, and ripple animation. Tap the
 teapot → tap an empty cup is also supported. Each cup fills once; pours cannot
@@ -28,6 +28,9 @@ remain unchanged.
 The table fills nearly the full phone width and expands on wider screens. Cups
 are 15% of the table image width, with at least 44px controls and forgiving
 drop targets around their openings. The table retains its original perspective.
+All three cups sit inward from the rim, with their full controls inside the
+tabletop ellipse. The liquid is pale, translucent golden tea with a light
+reflection and a brighter pouring stream, rather than opaque dark-brown liquid.
 
 Plain HTML/CSS/JavaScript, no dependencies or build step. Like the lion scene,
 this is a camera-relative overlay, not a spatially anchored table. Camera

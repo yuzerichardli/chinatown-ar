@@ -107,7 +107,7 @@ test('matching transparent 3D-style assets are used before, during, and after sh
   const html=fs.readFileSync(__dirname+'/index.html','utf8');
   assert.match(html,/id="table-surface" src="assets\/lazy-susan\.png"/);
   assert.match(html,/id="teapot" src="assets\/teapot-3d\.png"/);
-  assert.match(html,/dimsum\.css\?v=8/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=8/);
+  assert.match(html,/dimsum\.css\?v=9/);assert.match(html,/game\.js\?v=5/);assert.match(html,/dimsum\.js\?v=8/);
   for (const asset of [...dishes.map(d=>d.asset),'teapot-3d.png','tea-cup-3d.png','lazy-susan.png']) {
     const png=fs.readFileSync(__dirname+'/assets/'+asset);
     assert.equal(png.readUInt8(25),6,asset+' must retain RGBA transparency');
@@ -144,6 +144,29 @@ test('larger responsive table and smaller cups retain the table perspective and 
   assert.match(css,/#table-setting\{[^}]*aspect-ratio:3\/2/);
   assert.match(css,/#experience\{[^}]*overflow-x:clip/);
   assert.doesNotMatch(fs.readFileSync(__dirname+'/index.html','utf8'),/Tap to continue/);
+});
+test('all cup controls sit inside the tabletop ellipse, not across its edge',()=>{
+  const css=fs.readFileSync(__dirname+'/dimsum.css','utf8');
+  const width=Number(css.match(/\.tea-cup\{[^}]*width:(\d+)%/)[1])/100;
+  const halfWidth=width/2,halfHeight=width*1.5/2; // original 3:2 tabletop perspective
+  for(const id of cups) {
+    const position=css.match(new RegExp('\\.tea-cup\\[data-cup="'+id+'"\\]\\{left:(\\d+)%;top:(\\d+)%'));
+    assert.ok(position,'missing position for '+id);
+    const x=Number(position[1])/100,y=Number(position[2])/100;
+    for(const dx of [-halfWidth,halfWidth]) for(const dy of [-halfHeight,halfHeight]) {
+      const ellipse=Math.pow((x+dx-.5)/.455,2)+Math.pow((y+dy-.49)/.4,2);
+      assert.ok(ellipse<1,`${id} cup crosses the table edge`);
+    }
+  }
+});
+test('tea uses a pale translucent surface and a brighter stream instead of dark coffee colours',()=>{
+  const css=fs.readFileSync(__dirname+'/dimsum.css','utf8');
+  const surface=css.match(/\.tea-surface\{([^}]+)\}/)[1];
+  const stream=css.match(/\.tea-stream\{([^}]+)\}/)[1];
+  assert.match(surface,/#ffecb7cc/);assert.match(surface,/#f2cf78b8/);
+  assert.match(css,/\.tea-surface:before\{[^}]*border-top:1px solid/);
+  assert.match(stream,/width:5px/);assert.match(stream,/#fff4d5e6/);
+  assert.doesNotMatch(surface+stream,/#9b6323|#714110|#a36b28|#bf822b/);
 });
 test('table image is included in loading readiness, but Continue remains optional',()=>{
   const h=harness(undefined,false);h.el.arrive.fire('click');

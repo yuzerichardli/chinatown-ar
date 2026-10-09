@@ -23,8 +23,10 @@ img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none}#camera{pos
 .tea-cup{position:absolute;width:15%;min-height:44px;padding:0;aspect-ratio:1;background:none;opacity:1;pointer-events:auto;touch-action:none;transform:translate(-50%,-50%);border-radius:50%}
 .tea-cup img{display:block;width:100%;filter:drop-shadow(0 3px 2px #38220e4d);pointer-events:none}
 .tea-cup:disabled{opacity:1;cursor:default}
-.tea-cup[data-cup="left"]{left:15%;top:53%}.tea-cup[data-cup="right"]{left:85%;top:53%}.tea-cup[data-cup="front"]{left:50%;top:78%}
-.tea-surface{position:absolute;left:18%;top:22%;width:62%;height:20%;border-radius:50%;background:radial-gradient(ellipse at 36% 28%,#e7b65a 0,#c48c35 45%,#9b6323 100%);box-shadow:inset 0 1px 3px #71411088;opacity:0;transform:scale(.65);pointer-events:none}
+/* Leave a generous tabletop margin around the whole cup, not just its centre. */
+.tea-cup[data-cup="left"]{left:22%;top:59%}.tea-cup[data-cup="right"]{left:78%;top:59%}.tea-cup[data-cup="front"]{left:50%;top:75%}
+.tea-surface{position:absolute;left:18%;top:22%;width:62%;height:20%;border-radius:50%;background:radial-gradient(ellipse at 36% 28%,#ffecb7cc 0,#f2cf78b8 48%,#d3a751b3 100%);box-shadow:inset 0 1px 2px #b4894d40;opacity:0;transform:scale(.65);pointer-events:none}
+.tea-surface:before{content:"";position:absolute;left:22%;top:18%;width:34%;height:14%;border-top:1px solid #fff8e9b3;border-radius:50%;transform:rotate(-10deg)}
 .tea-cup.filled .tea-surface{opacity:1;transform:scale(1)}
 .tea-cup.pouring .tea-surface{animation:tea-fill 1.1s .3s ease-in-out both}
 .tea-cup.pouring .tea-surface:after{content:"";position:absolute;inset:15%;border:1px solid #fbe0a488;border-radius:50%;animation:tea-ripple .55s .35s linear infinite}
@@ -38,7 +40,7 @@ img{user-select:none;-webkit-user-select:none;-webkit-user-drag:none}#camera{pos
 .tea-drag-ghost{width:105px;transform:translate(-50%,-65%)}
 .tea-pour-effect{position:fixed;z-index:25;pointer-events:none}
 .tea-pour-effect img{display:block;width:100%;transform-origin:5.5% 36%;filter:drop-shadow(0 4px 4px #0004);animation:tea-tilt 1.7s ease-in-out both}
-.tea-stream{position:absolute;left:5.5%;top:36%;width:4px;height:58px;margin-left:-2px;border-radius:40%;background:linear-gradient(90deg,#a36b28aa,#f4ce76,#bf822bbb);transform-origin:top;animation:tea-flow 1.7s ease-in-out both}
+.tea-stream{position:absolute;left:5.5%;top:36%;width:5px;height:58px;margin-left:-2.5px;border-radius:40%;background:linear-gradient(90deg,#edce8299,#fff4d5e6 45%,#eac16f99);box-shadow:0 0 3px #ffebad55;transform-origin:top;animation:tea-flow 1.7s ease-in-out both}
 #tea-message{font-size:18px;line-height:1.5;margin:12px 0 4px;color:#fff;text-shadow:0 2px 8px #000,0 0 18px #0008}
 #tea-message.served{font-size:26px}
 .controls{width:min(100%,480px);margin:auto;padding:5px 22px 2px;text-align:center}#status{font-size:13px;line-height:1.5;min-height:20px;margin:8px 0 3px;color:#f9ecd3;text-shadow:0 1px 4px #0008}.small{font-size:11px;color:#e1ddd4;line-height:1.6;margin:2px 0}#continue{width:100%;margin:14px 0 4px}
