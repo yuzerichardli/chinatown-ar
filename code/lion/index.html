@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Phillips Square · Lion Dance</title>
+  <link rel="stylesheet" href="./lion.css?v=9">
+  <script src="./lion.js?v=11" defer></script>
+</head>
+<body>
+  <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
+  <main>
+    <section id="arrival" aria-labelledby="arrival-title">
+      <h1 id="arrival-title">Are you at Phillips Square?</h1>
+      <button id="arrive">Yes</button>
+    </section>
+    <section id="experience" hidden aria-label="Lion dance interaction">
+      <div id="fireworks" aria-hidden="true"></div>
+      <div id="stage"><div class="lion-pair"><img id="lion" src="./assets/lion.png" alt="A red and gold lion dance costume with its performers" draggable="false"><img id="lion-two" src="./assets/lion-white-pink.png" alt="A white and pink lion with its performers in a low bow" draggable="false"></div></div>
+      <div class="controls">
+        <p id="status" class="sr-only" role="status">Loading the lion…</p>
+        <progress id="progress" max="8000" value="0" aria-label="Lion movement progress"></progress>
+        <button id="hold" disabled>Press &amp; hold to move</button>
+        <div id="camera-fallback" hidden><p id="camera-status" role="status"></p><button id="enable-camera" class="text-button">Try camera again</button></div>
+      </div>
+    </section>
+    <section id="reading" hidden aria-label="Story and reflection">
+      <article id="page" tabindex="-1"></article>
+      <nav><button id="back" class="secondary">Back</button><button id="next">Next</button></nav>
+    </section>
+  </main>
+</body>
+</html>

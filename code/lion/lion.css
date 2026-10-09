@@ -1,0 +1,25 @@
+:root{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#fff;background:#242329;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0} [hidden]{display:none!important}
+#arrival{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:32px;text-align:center;background:transparent;color:white}#arrival h1{max-width:520px;text-shadow:0 2px 8px #000,0 0 20px #0009}#arrive{min-width:180px}
+#experience{position:relative;isolation:isolate}#fireworks{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:-1}#fireworks svg{width:100%;height:100%;display:block}
+#camera{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}main{position:relative}
+#experience{min-height:100svh;display:flex;flex-direction:column;background:linear-gradient(transparent 75%,#17171d77)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}#camera-fallback{font-size:13px;background:#242329dd;border-radius:12px;margin-top:12px;padding:8px}#progress{height:4px}
+header{text-align:center;padding:max(22px,env(safe-area-inset-top)) 20px 0}header p{margin:8px 0;color:#eee0c5}h1{font-size:clamp(26px,6vw,38px);line-height:1.15;margin:12px 0} .eyebrow{font-size:11px;letter-spacing:1.5px}
+#stage{flex:1;min-height:190px;display:grid;place-items:center;padding:24px 25px;overflow:hidden}
+.lion-pair{width:min(100%,1000px);display:flex;align-items:flex-end;gap:4%;padding:20px 0}
+#lion,#lion-two{width:48%;max-height:45svh;object-fit:contain;transform-origin:58% 86%;user-select:none;-webkit-user-drag:none;will-change:transform}
+#lion-two{order:-1;transform-origin:45% 88%}
+@media(max-width:520px){#stage{padding:24px 12px}.lion-pair{gap:6%}#lion,#lion-two{width:47%;max-height:36svh}}
+.controls{width:min(100%,540px);margin:auto;padding:0 22px max(16px,env(safe-area-inset-bottom));text-align:center}
+#status{font-size:14px;min-height:20px;margin:0 0 10px}
+progress#progress{appearance:none;-webkit-appearance:none;display:block;width:100%;height:10px;margin-bottom:16px;border:0;border-radius:999px;overflow:hidden;background:#ffffff40;accent-color:#ffd43b}
+progress#progress::-webkit-progress-bar{background:#ffffff40;border-radius:999px}
+progress#progress::-webkit-progress-value{background:#ffd43b;border-radius:999px}
+progress#progress::-moz-progress-bar{background:#ffd43b;border-radius:999px}
+button{font:inherit;border:0;border-radius:12px;background:#a93429;color:white;padding:15px 18px;font-size:16px;min-height:48px;cursor:pointer}button:focus-visible{outline:3px solid #eacb84;outline-offset:4px}button:disabled{opacity:.5;cursor:wait}#hold,#continue{width:100%}#hold{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}#hold.active{background:#cc4934;box-shadow:0 0 0 3px #eec57988}
+.text-button{background:none;color:#f0dfbe;font-size:13px;padding:8px;min-height:44px}.camera-controls{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.camera-controls span{font-size:11px;max-width:240px}.small{font-size:11px;color:#e1ddd4;line-height:1.6;margin:4px 0}
+#reading{position:fixed;inset:0;background:#faf5e9;color:#302f2b;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+#page{overflow:auto;flex:1;padding:30px max(24px,calc((100vw - 760px)/2));font-size:18px;line-height:1.7;overscroll-behavior:contain}#page h2{font-size:28px;line-height:1.25;color:#843a2e;margin:10px 0 24px}#page .eyebrow{color:#726959}#page p{margin:0 0 20px}#page blockquote{margin:24px 0;padding-left:18px;border-left:3px solid #baa57a}#page[lang="zh-Hans"]{line-height:1.95}#page .question{font-size:clamp(23px,5vw,32px);line-height:1.5;margin-top:30px}#page .note{font-size:14px;color:#736c60}
+nav{display:flex;justify-content:space-between;gap:16px;padding:16px max(24px,calc((100vw - 760px)/2)) max(18px,env(safe-area-inset-bottom));border-top:1px solid #ded3bd;background:#faf5e9}.secondary{background:#e9dfcd;color:#403b32}
+@media(max-height:600px) and (orientation:landscape){#stage{min-height:120px;padding:12px 25px}#lion,#lion-two{max-height:52svh}.lion-pair{padding:8px 0}.controls{padding-top:8px}}
