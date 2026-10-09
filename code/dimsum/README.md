@@ -4,14 +4,23 @@ Live: https://yuzerichardli.github.io/chinatown-ar/code/dimsum/
 QR: `../../qr/dimsum.png` (same directory as the other scene QR codes).
 This existing QR opens the latest deployed version of the dim sum activity.
 
-One simple interaction, following the herbal-soup game: drag four dishes onto
-one shared table. No matching requests, rotation, timer, score, or tea-pouring
-stage. A tap-a-dish → tap-the-table alternative also supports keyboard input.
-The game view has no visible labels, instructions, headings, or counters.
-Continue is available immediately: sharing any or all of the dishes is optional.
-Continue opens English, Chinese, and bilingual reflection pages, then Replay.
+Two short interactions, following the herbal-soup game: share dim sum on one
+table, then serve tea to three cups. No matching requests, rotation, timer,
+or score. A tap-a-dish → tap-the-table alternative also supports keyboard input.
+The dish-sharing view has no visible labels, instructions, headings, or counters.
+Its Continue button is available immediately: sharing any or all dishes is optional.
+Continue places any remaining dishes on the table and adds three matching cups
+around its edge, without removing the existing table or placed dishes. One line
+says “Drag the teapot to fill each cup.” Drop the pot over each cup opening to
+trigger a tilt, tea stream, filling tea surface, and ripple animation. Tap the
+teapot → tap an empty cup is also supported. Each cup fills once; pours cannot
+overlap. After the third pour finishes, “Enjoy your meal!” and Continue appear.
+That Continue opens English, Chinese, and bilingual reflection pages, then Replay.
 All game objects and the camera are hidden while reading. Back preserves the
-table as it was; Replay clears it. The opening shows a drawing of the 180 Café
+served table and filled cups; Replay clears dishes and tea. Leaving the page,
+switching away, or resizing during a pour cancels it safely without counting
+that cup. Reduced-motion mode uses a short static pouring pose instead.
+The opening shows a drawing of the 180 Café
 sign and asks “Are you in front of the 180 cafe?” → Yes, matching the landmark
 openings in the other activities.
 All button labels are English-only; the Chinese story and bilingual reflection
@@ -34,8 +43,9 @@ built-in image-generation tool, using the herbal-soup pot as a lighting and
 material reference. The new wood tabletop and raised glass lazy Susan were
 generated separately in the same finish. No restaurant photographs or
 third-party food artwork were copied. These are lightweight image sprites,
-not new GLB models or spatially anchored objects. The teapot and lazy Susan
-are visual only: no tea-pouring or rotation task has been added.
+not new GLB models or spatially anchored objects. The same teapot sprite is
+used on the table, while dragging, and for the pouring animation. The lazy
+Susan remains visual only; no rotation task has been added.
 
 Current files in `assets/`:
 
@@ -43,6 +53,9 @@ Current files in `assets/`:
   `egg-tart-3d.png`, `teapot-3d.png`: 640px RGBA PNGs.
 - `lazy-susan.png`: 1024 × 683 RGBA PNG, displayed without distorting its
   perspective. Shared dishes use small contact shadows on its surface.
+- `tea-cup-3d.png`: 640px RGBA PNG, matching the ivory/cobalt-blue teapot.
+  An animated CSS tea surface sits inside the opening, so the cup's shape,
+  decoration, and position stay identical while it fills.
 
 The original five PNGs remain in the folder, unused, for rollback. New
 filenames and bumped controller/style versions avoid stale cached pictures.
@@ -157,10 +170,19 @@ One background-cleanup edit used that table as its only input. Exact prompt:
 > wood, glass rim, and central turntable support. Do not add legs, pedestal,
 > food, people, text, frames, or other objects.
 
-All seven calls used `transparent_background: true`. Final assets were
+These seven restyling calls used `transparent_background: true`. Final assets were
 resized with their alpha preserved; transparent padding is not an opaque
 background. Browser checks cover the normal game, drag/tap placement,
-full table, optional Continue, Back/Replay, and clean story screens.
+full table, optional dish-sharing Continue, sequential tea serving, Back/Replay,
+and clean story screens.
+
+### Tea cup prompt (built-in tool)
+
+New generation with `teapot-3d.png` as a style/material reference only, using
+`transparent_background: true`. The generated alpha was preserved when resizing
+to the project asset `assets/tea-cup-3d.png`. Exact prompt:
+
+> Use case: stylized-concept. Asset type: transparent mobile Chinatown AR game sprite. Primary request: one empty handleless Chinese restaurant tea cup to match the teapot in Image 1. Image 1 is a style/material reference ONLY; do not include the teapot. Subject: one small round warm ivory porcelain tea cup, with restrained cobalt-blue floral brushwork matching the reference, thin blue rim, short circular foot, smooth softly rounded sides. The cup is EMPTY: clearly visible clean ivory interior, no liquid. Cohesive lightly stylized realistic 3D rendering, softly satin glaze, warm diffuse upper-left lighting, gentle baked-in shading, same elevated three-quarter view about 40 degrees above horizontal as the reference. Straight-on symmetric cup; opening is a broad readable horizontal ellipse, not a steep top-down view. Complete cup centered with small even transparent margin; isolated on genuinely transparent alpha. No saucer, handle, lid, teapot, table, floor, environment, external ground shadow, steam, people, text, logos, watermark, border, or extra objects. Keep silhouette edges smooth and clean.
 
 ### Original generation prompt set (retained assets)
 

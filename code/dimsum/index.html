@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#843a2e">
-  <meta name="description" content="Bring four dim sum dishes to a shared table in this simple Chinatown AR mini game.">
+  <meta name="description" content="Share dim sum and pour tea together in this simple Chinatown AR mini game.">
   <title>Dim Sum · Share the Table</title>
-  <link rel="stylesheet" href="dimsum.css?v=6">
-  <script src="game.js?v=4" defer></script>
-  <script src="dimsum.js?v=6" defer></script>
+  <link rel="stylesheet" href="dimsum.css?v=7">
+  <script src="game.js?v=5" defer></script>
+  <script src="dimsum.js?v=7" defer></script>
 </head>
 <body>
   <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
@@ -22,15 +22,21 @@
     <section id="experience" hidden aria-label="Dim sum sharing">
       <div id="board" aria-label="Four dim sum dishes and a lazy Susan table">
         <div id="dishes"></div>
-        <button id="shared-table" aria-label="Place the selected dish on the lazy Susan">
-          <img id="table-surface" src="assets/lazy-susan.png" alt="" draggable="false">
-          <img id="teapot" src="assets/teapot-3d.png" alt="" draggable="false">
-          <span id="shared-dishes" aria-hidden="true"></span>
-        </button>
+        <div id="table-setting">
+          <button id="shared-table" aria-label="Place the selected dish on the lazy Susan">
+            <img id="table-surface" src="assets/lazy-susan.png" alt="" draggable="false">
+            <span id="shared-dishes" aria-hidden="true"></span>
+          </button>
+          <div id="tea-cups" hidden></div>
+          <button id="teapot-control" aria-label="Select the teapot, then select an empty cup" aria-pressed="false" disabled>
+            <img id="teapot" src="assets/teapot-3d.png" alt="" draggable="false">
+          </button>
+        </div>
       </div>
 
       <div class="controls">
         <p id="status" class="sr-only" role="status"></p>
+        <p id="tea-message" hidden role="status"></p>
         <button id="continue">Tap to continue</button>
       </div>
     </section>

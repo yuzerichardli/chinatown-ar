@@ -1,10 +1,11 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const { dishes, createGame } = window.DimSumGame;
-  const game = createGame(), dishNodes = new Map();
+  const { dishes, cups, createGame } = window.DimSumGame;
+  const game = createGame(), dishNodes = new Map(), cupNodes = new Map();
   const dishAssets = new Map(dishes.map(dish => [dish.id, `assets/${dish.asset}`]));
   let ready = false, drag = null, lastDragAt = -Infinity, pageIndex = 0;
+  let pourTimer = null, pourEffect = null;
   let stream = null, cameraRequest = 0, cameraPending = false, cameraWanted = false;
   const pages = [
     {
@@ -27,6 +28,17 @@
   ];
 
   function status(message) { $('status').textContent = message; }
+  for (const [index, id] of cups.entries()) {
+    const node = document.createElement('button');
+    node.className = 'tea-cup'; node.dataset.cup = id; node.id = `cup-${id}`;
+    node.setAttribute('aria-label', `Tea cup ${index + 1}: empty`);
+    node.innerHTML = '<img src="assets/tea-cup-3d.png" alt="" draggable="false"><span class="tea-surface" aria-hidden="true"></span>';
+    $('tea-cups').append(node); cupNodes.set(id, node);
+    node.addEventListener('click', () => {
+      if (game.state.potSelected) pour(id);
+      else status('Select the teapot first, then an empty cup.');
+    });
+  }
   for (const dish of dishes) {
     const node = document.createElement('button');
     node.className = 'dish'; node.dataset.dish = dish.id; node.disabled = true;
@@ -80,12 +92,91 @@
     current.ghost?.remove(); current.node.classList.remove('dragging');
     if (current.node.hasPointerCapture(current.pointer)) current.node.releasePointerCapture(current.pointer);
     $('shared-table').classList.remove('drop-target');
+    for (const node of cupNodes.values()) node.classList.remove('drop-target');
   }
-  function share(id) {
-    if (!ready || !game.share(id)) return;
+  function overCup(x, y) {
+    // Forgiving touch targets around the cup opening, but never refill a full cup.
+    return cups.find(id => {
+      if (game.state.filled.includes(id)) return false;
+      const rect = cupNodes.get(id).getBoundingClientRect();
+      return x >= rect.left + rect.width * .12 && x <= rect.right - rect.width * .12 &&
+        y >= rect.top && y <= rect.top + rect.height * .65;
+    });
+  }
+  const pot = $('teapot-control');
+  pot.addEventListener('click', event => {
+    if (event.detail !== 0 && performance.now() - lastDragAt < 350) return;
+    if (!ready || !game.selectPot()) return;
+    render(); status(game.state.potSelected ? 'Now select an empty cup.' : 'Drag the teapot to fill each cup.');
+  });
+  pot.addEventListener('pointerdown', event => {
+    if (!event.isPrimary || event.button !== 0 || !ready || game.state.phase !== 'tea' || drag) return;
+    event.preventDefault(); pot.setPointerCapture(event.pointerId);
+    drag = { pointer: event.pointerId, x: event.clientX, y: event.clientY, moved: false, ghost: null, node: pot };
+  });
+  pot.addEventListener('pointermove', event => {
+    if (!drag || drag.node !== pot || drag.pointer !== event.pointerId) return;
+    if (!drag.moved && Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 8) {
+      drag.moved = true; drag.ghost = document.createElement('img');
+      drag.ghost.src = $('teapot').src; drag.ghost.className = 'drag-ghost tea-drag-ghost';
+      drag.ghost.alt = ''; drag.ghost.setAttribute('aria-hidden', 'true');
+      document.body.append(drag.ghost); pot.classList.add('dragging');
+    }
+    if (!drag.moved) return;
+    drag.ghost.style.left = `${event.clientX}px`; drag.ghost.style.top = `${event.clientY}px`;
+    const target = overCup(event.clientX, event.clientY);
+    for (const [id, node] of cupNodes) node.classList.toggle('drop-target', id === target);
+  });
+  pot.addEventListener('pointerup', event => {
+    if (!drag || drag.node !== pot || drag.pointer !== event.pointerId) return;
+    const moved = drag.moved, target = overCup(event.clientX, event.clientY);
+    clearDrag();
+    if (moved) {
+      lastDragAt = performance.now();
+      if (target) pour(target);
+      else status('Bring the teapot over an empty cup.');
+    }
+  });
+  for (const name of ['pointercancel', 'lostpointercapture']) pot.addEventListener(name, event => {
+    if (drag?.pointer === event.pointerId) clearDrag();
+  });
+  function clearPour() {
+    if (pourTimer !== null) { clearTimeout(pourTimer); pourTimer = null; }
+    pourEffect?.remove(); pourEffect = null;
+    game.cancelPour(); render();
+  }
+  function pour(id) {
+    if (!ready || !game.beginPour(id)) return;
+    clearDrag();
+    const rect = cupNodes.get(id).getBoundingClientRect();
+    const size = Math.max(92, Math.min(118, rect.width * 1.4));
+    // Anchor the original pot's spout directly above the cup's opening.
+    const mouthX = rect.left + rect.width * .49, mouthY = rect.top + rect.height * .32;
+    pourEffect = document.createElement('div');
+    pourEffect.className = 'tea-pour-effect'; pourEffect.setAttribute('aria-hidden', 'true');
+    pourEffect.style.width = `${size}px`; pourEffect.style.height = `${size}px`;
+    pourEffect.style.left = `${mouthX - size * .055}px`;
+    pourEffect.style.top = `${mouthY - 58 - size * .36}px`;
+    pourEffect.innerHTML = '<img src="assets/teapot-3d.png" alt=""><span class="tea-stream"></span>';
+    document.body.append(pourEffect);
+    render(); status(`Pouring tea into cup ${cups.indexOf(id) + 1}.`);
+    const duration = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 450 : 1700;
+    pourTimer = setTimeout(() => {
+      pourTimer = null; pourEffect?.remove(); pourEffect = null;
+      if (!game.finishPour()) return;
+      render();
+      if (game.state.phase === 'served') { status('All three cups are filled. Enjoy your meal!'); $('continue').focus(); }
+      else { status('Tea is ready in this cup. Fill the next one.'); pot.focus(); }
+    }, duration);
+  }
+  function addSharedDish(id) {
     const img = document.createElement('img');
     img.src = dishAssets.get(id); img.className = 'shared-dish'; img.alt = '';
     $('shared-dishes').append(img);
+  }
+  function share(id) {
+    if (!ready || !game.share(id)) return;
+    addSharedDish(id);
     render();
     if (game.state.phase === 'ready') { status('A little of everything, for everyone. · 各样点心，一起分享。'); $('continue').focus(); }
     else status('One more dish to share. · 又多一份，一起分享。');
@@ -97,11 +188,30 @@
   });
   $('board').addEventListener('contextmenu', event => event.preventDefault());
   function render() {
-    const complete = ['ready', 'story'].includes(game.state.phase);
+    const phase = game.state.phase;
+    const tea = ['tea', 'pouring', 'served', 'story'].includes(phase);
+    const complete = phase === 'ready' || tea;
     $('board').classList.toggle('complete', complete);
-    $('continue').hidden = !['sharing', 'ready'].includes(game.state.phase);
-    $('camera-controls').hidden = game.state.phase !== 'arrival';
+    $('board').classList.toggle('tea-stage', tea);
+    $('dishes').hidden = tea;
+    $('tea-cups').hidden = !tea;
+    $('tea-message').hidden = !tea;
+    $('tea-message').textContent = phase === 'served' || phase === 'story' ? 'Enjoy your meal!' : ready ? 'Drag the teapot to fill each cup.' : 'Preparing the tea cups…';
+    $('tea-message').classList.toggle('served', phase === 'served' || phase === 'story');
+    $('continue').hidden = !['sharing', 'ready', 'served'].includes(phase);
+    $('camera-controls').hidden = phase !== 'arrival';
     $('shared-table').disabled = complete;
+    pot.disabled = !ready || phase !== 'tea';
+    pot.classList.toggle('selected', game.state.potSelected);
+    pot.classList.toggle('pouring', phase === 'pouring');
+    pot.setAttribute('aria-pressed', String(game.state.potSelected));
+    for (const [index, id] of cups.entries()) {
+      const node = cupNodes.get(id), filled = game.state.filled.includes(id);
+      node.disabled = !ready || phase !== 'tea' || filled;
+      node.classList.toggle('filled', filled);
+      node.classList.toggle('pouring', game.state.pouring === id);
+      node.setAttribute('aria-label', `Tea cup ${index + 1}: ${filled ? 'filled' : 'empty'}`);
+    }
     for (const dish of dishes) {
       const node = dishNodes.get(dish.id);
       node.hidden = game.state.shared.includes(dish.id); node.disabled = !ready || game.state.phase !== 'sharing';
@@ -148,7 +258,8 @@
     cameraWanted = true; openCamera();
   });
   function showPage(index) {
-    clearDrag(); game.read(); stopCamera(); pageIndex = index;
+    if (!game.read()) return;
+    clearDrag(); clearPour(); stopCamera(); pageIndex = index;
     $('arrival').hidden = true; $('experience').hidden = true; $('camera-controls').hidden = true; $('camera').hidden = true;
     $('reading').hidden = false;
     const page = pages[index];
@@ -158,7 +269,7 @@
     $('page').focus();
   }
   function returnToTable(replay) {
-    clearDrag();
+    clearDrag(); clearPour();
     if (replay) { game.reset(); game.start(); $('shared-dishes').replaceChildren(); }
     else game.returnToTable();
     $('reading').hidden = true; $('experience').hidden = false; $('camera').hidden = false;
@@ -166,17 +277,26 @@
     if (replay) dishNodes.get(dishes[0].id).focus(); else $('continue').focus();
     openCamera();
   }
-  $('continue').addEventListener('click', () => { if (['sharing', 'ready'].includes(game.state.phase)) showPage(0); });
+  $('continue').addEventListener('click', () => {
+    // Keep all four dishes on the tea table, even when dish-sharing was skipped.
+    if (['sharing', 'ready'].includes(game.state.phase)) {
+      for (const dish of dishes) if (game.share(dish.id)) addSharedDish(dish.id);
+    }
+    if (game.beginTea()) {
+      clearDrag(); render(); status('Drag the teapot to fill each cup.'); pot.focus();
+    } else if (game.state.phase === 'served') showPage(0);
+  });
   $('next').addEventListener('click', () => { if (pageIndex < pages.length - 1) showPage(pageIndex + 1); else returnToTable(true); });
   $('back').addEventListener('click', () => { if (pageIndex > 0) showPage(pageIndex - 1); else returnToTable(false); });
-  window.addEventListener('blur', clearDrag);
+  window.addEventListener('blur', () => { clearDrag(); clearPour(); });
+  window.addEventListener('resize', () => { clearDrag(); clearPour(); });
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { clearDrag(); stopCamera(); } else openCamera();
+    if (document.hidden) { clearDrag(); clearPour(); stopCamera(); } else openCamera();
   });
-  window.addEventListener('pagehide', () => { clearDrag(); stopCamera(); });
+  window.addEventListener('pagehide', () => { clearDrag(); clearPour(); stopCamera(); });
   window.addEventListener('pageshow', () => { if (cameraWanted) openCamera(); });
 
-  const images = [...dishNodes.values()].map(node => node.querySelector('img')).concat($('teapot'), $('table-surface'));
+  const images = [...dishNodes.values(), ...cupNodes.values()].map(node => node.querySelector('img')).concat($('teapot'), $('table-surface'));
   function loaded() {
     if (!images.every(img => img.complete && img.naturalWidth)) return;
     ready = true; render();
